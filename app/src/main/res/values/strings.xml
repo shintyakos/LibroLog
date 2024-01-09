@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">LiberoLog</string>
+
+    // Home
+    <string name="home">home</string>
+    <string name="home_title">読書管理アプリ</string>
+    <string name="home_icons_menu">Menu</string>
+    <string name="home_icons_settings">Settings</string>
+</resources>
