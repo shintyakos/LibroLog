@@ -3,12 +3,15 @@ package com.example.liberolog
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import com.example.liberolog.ui.theme.LiberoLogTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            LiberoLogApp()
+            LiberoLogTheme(dynamicColor = false) {
+                LiberoLogApp()
+            }
         }
     }
 }
