@@ -1,6 +1,6 @@
-package com.example.LiberoLog
+package com.example.liberolog
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 /**
