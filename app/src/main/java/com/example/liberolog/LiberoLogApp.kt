@@ -1,10 +1,7 @@
 package com.example.liberolog
 
-import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -18,6 +15,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -28,14 +26,16 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.liberolog.ui.screen.HomeScreen
-import com.example.liberolog.ui.theme.LiberoLogTheme
+import com.example.liberolog.utils.NavigationItem
+import com.example.liberolog.viewmodel.HomeViewModel
 
 /**
  * `LiberoLogApp` is a Composable function that sets up the navigation for the application.
@@ -58,11 +58,13 @@ fun LiberoLogApp() {
 fun LiberoLogAppNavHost(navController: NavHostController) {
     Scaffold(
         topBar = { HomeScreenTopBar() },
-        bottomBar = { HomeScreenBottomBar() },
+        bottomBar = { HomeScreenBottomBar(navController) },
     ) { padding ->
-        Log.d("LiberoLogAppNavHost", "padding: $padding")
-        NavHost(navController = navController, startDestination = "home") {
-            composable(route = "home") { HomeScreen() }
+        NavHost(navController = navController, startDestination = NavigationItem.HOME.route) {
+            composable(NavigationItem.HOME.route) {
+                val viewModel = hiltViewModel<HomeViewModel>()
+                HomeScreen(padding, viewModel)
+            }
         }
     }
 }
@@ -116,26 +118,27 @@ fun HomeScreenTopBar() {
 }
 
 @Composable
-fun HomeScreenBottomBar() {
-    NavigationBar(modifier = Modifier.fillMaxWidth()) {
-        NavigationBarItem(
-            selected = true,
-            onClick = { /*TODO*/ },
-            icon = { Icon(imageVector = Icons.Filled.Home, contentDescription = "Home") },
-            label = { Text(text = "home") },
-            colors =
-                NavigationBarItemDefaults.colors(
-                    selectedIconColor = MaterialTheme.colorScheme.primary,
-                    selectedTextColor = MaterialTheme.colorScheme.primary,
-                ),
-        )
-    }
-}
+fun HomeScreenBottomBar(navController: NavHostController) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
 
-@Preview
-@Composable
-fun HomeScreen() {
-    LiberoLogTheme(dynamicColor = false) {
-        LiberoLogApp()
+    NavigationBar(containerColor = Color.White) {
+        NavigationItem.entries.forEach { item ->
+            NavigationBarItem(
+                selected = currentRoute == item.route,
+                onClick = {
+                    navController.navigate(item.route)
+                },
+                icon = { Icon(imageVector = item.icon, contentDescription = item.route) },
+                label = { Text(text = stringResource(id = item.label), maxLines = 1) },
+                colors =
+                    NavigationBarItemDefaults.colors(
+                        selectedIconColor = MaterialTheme.colorScheme.primary,
+                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        indicatorColor = Color.White,
+                    ),
+                alwaysShowLabel = true,
+            )
+        }
     }
 }
