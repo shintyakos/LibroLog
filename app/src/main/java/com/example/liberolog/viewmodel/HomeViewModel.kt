@@ -15,10 +15,8 @@ class HomeViewModel
         private val saveStateHandle: SavedStateHandle,
         private val repository: HomeRepository,
     ) : ViewModel() {
-        val homeModel: MutableLiveData<HomeScreenModel> by lazy {
-            MutableLiveData<HomeScreenModel>().also {
-                loadHomeModel()
-            }
+        val homeModel: MutableLiveData<HomeScreenModel> = MutableLiveData<HomeScreenModel>().also {
+            loadHomeModel()
         }
 
         private fun loadHomeModel() {
