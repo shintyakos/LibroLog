@@ -62,8 +62,7 @@ fun LiberoLogAppNavHost(navController: NavHostController) {
     ) { padding ->
         NavHost(navController = navController, startDestination = NavigationItem.HOME.route) {
             composable(NavigationItem.HOME.route) {
-                val viewModel = hiltViewModel<HomeViewModel>()
-                HomeScreen(padding, viewModel)
+                HomeScreen(padding)
             }
         }
     }

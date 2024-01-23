@@ -30,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.liberolog.R
 import com.example.liberolog.model.Book
@@ -48,7 +49,7 @@ import com.example.liberolog.viewmodel.HomeViewModel
 )
 fun HomeScreen(
     padding: PaddingValues,
-    viewModel: HomeViewModel,
+    viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val homeModel = viewModel.homeModel.observeAsState()
 

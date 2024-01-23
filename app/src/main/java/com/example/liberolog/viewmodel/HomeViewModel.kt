@@ -11,13 +11,14 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel
     @Inject
-    constructor(
+    internal constructor(
         private val saveStateHandle: SavedStateHandle,
         private val repository: HomeRepository,
     ) : ViewModel() {
-        val homeModel: MutableLiveData<HomeScreenModel> = MutableLiveData<HomeScreenModel>().also {
-            loadHomeModel()
-        }
+        val homeModel: MutableLiveData<HomeScreenModel> =
+            MutableLiveData<HomeScreenModel>().also {
+                loadHomeModel()
+            }
 
         private fun loadHomeModel() {
             // TODO: implement
