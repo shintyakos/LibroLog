@@ -3,9 +3,11 @@ package com.example.liberolog.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.liberolog.model.HomeScreenModel
 import com.example.liberolog.repository.HomeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,6 +23,8 @@ class HomeViewModel
             }
 
         private fun loadHomeModel() {
-            // TODO: implement
+            viewModelScope.launch {
+                repository.getBookFromFirebase()
+            }
         }
     }

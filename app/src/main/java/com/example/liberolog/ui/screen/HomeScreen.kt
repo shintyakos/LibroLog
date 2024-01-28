@@ -151,7 +151,7 @@ private fun CardView(book: Book) {
 @Preview(showSystemUi = true, showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    val monBooks = listOf(Book("title", "author"), Book("title2", "author2"))
-    val recBooks = listOf(Book("title", "author"), Book("title2", "author2"))
-    MainContents(monBooks, recBooks)
+//    val monBooks = listOf(Book("title", "author"), Book("title2", "author2"))
+//    val recBooks = listOf(Book("title", "author"), Book("title2", "author2"))
+//    MainContents(monBooks, recBooks)
 }
