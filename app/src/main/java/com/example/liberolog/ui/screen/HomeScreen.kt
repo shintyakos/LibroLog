@@ -1,6 +1,5 @@
 package com.example.liberolog.ui.screen
 
-import android.media.Image
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,19 +14,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -132,7 +128,7 @@ private fun CardView(book: Book) {
                 .background(Color.White),
     ) {
         Image(
-            painter = rememberAsyncImagePainter("https://play.pokemonshowdown.com/sprites/ani/pikachu.gif"),
+            painter = rememberAsyncImagePainter(book.image),
             contentDescription = null,
             contentScale = ContentScale.Fit,
             modifier = Modifier.size(150.dp),
@@ -146,12 +142,4 @@ private fun CardView(book: Book) {
                 .height(1.dp)
                 .background(Color(0xFFE0E0E0)),
     )
-}
-
-@Preview(showSystemUi = true, showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-//    val monBooks = listOf(Book("title", "author"), Book("title2", "author2"))
-//    val recBooks = listOf(Book("title", "author"), Book("title2", "author2"))
-//    MainContents(monBooks, recBooks)
 }
