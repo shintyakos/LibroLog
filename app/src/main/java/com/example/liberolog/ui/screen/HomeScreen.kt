@@ -1,5 +1,6 @@
 package com.example.liberolog.ui.screen
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,23 +11,25 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.rememberAsyncImagePainter
 import com.example.liberolog.R
-import com.example.liberolog.model.HomeScreenModel
+import com.example.liberolog.model.Book
 import com.example.liberolog.viewmodel.HomeViewModel
 
 /**
@@ -42,19 +45,10 @@ import com.example.liberolog.viewmodel.HomeViewModel
 )
 fun HomeScreen(
     padding: PaddingValues,
-    viewModel: HomeViewModel,
+    viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val homeModel = viewModel.homeModel.observeAsState()
-    MainContents(padding, homeModel.value)
-}
 
-@Composable
-@Suppress(
-    "ktlint:standard:argument-list-wrapping",
-    "ktlint:standard:function-signature",
-    "ktlint:standard:wrapping",
-)
-private fun MainContents(padding: PaddingValues, homeModel: HomeScreenModel?) {
     Column(
         modifier =
             Modifier
@@ -62,6 +56,16 @@ private fun MainContents(padding: PaddingValues, homeModel: HomeScreenModel?) {
                 .fillMaxHeight()
                 .padding(padding),
     ) {
+        MainContents(homeModel.value?.monBookList, homeModel.value?.recBookList)
+    }
+}
+
+@Composable
+private fun MainContents(
+    monBooks: List<Book>?,
+    recBooks: List<Book>?,
+) {
+    Column {
         Row(
             modifier =
                 Modifier
@@ -83,7 +87,9 @@ private fun MainContents(padding: PaddingValues, homeModel: HomeScreenModel?) {
                     ),
             )
         }
-        CardView()
+        monBooks?.forEach {
+            CardView(it)
+        }
         Row(
             modifier =
                 Modifier
@@ -105,35 +111,35 @@ private fun MainContents(padding: PaddingValues, homeModel: HomeScreenModel?) {
                     ),
             )
         }
-        CardView()
-    }
-}
-
-@Composable
-private fun CardView() {
-    val list = listOf(1, 2, 3)
-
-    list.forEach { _ ->
-        Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(88.dp)
-                    .background(Color.White),
-        ) {
+        recBooks?.forEach {
+            CardView(it)
         }
-        Spacer(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(1.dp)
-                    .background(Color(0xFFE0E0E0)),
-        )
     }
 }
 
-@Preview(showSystemUi = true, showBackground = true)
 @Composable
-fun HomeScreenPreview() {
-    MainContents(PaddingValues(0.dp), HomeScreenModel("", ""))
+@Suppress("ktlint:standard:max-line-length")
+private fun CardView(book: Book) {
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(88.dp)
+                .background(Color.White),
+    ) {
+        Image(
+            painter = rememberAsyncImagePainter(book.image),
+            contentDescription = null,
+            contentScale = ContentScale.Fit,
+            modifier = Modifier.size(150.dp),
+        )
+        Text(book.title)
+    }
+    Spacer(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .background(Color(0xFFE0E0E0)),
+    )
 }
