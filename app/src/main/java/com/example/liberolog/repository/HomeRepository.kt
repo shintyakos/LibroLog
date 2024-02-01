@@ -1,40 +1,69 @@
 package com.example.liberolog.repository
 
+import android.util.Log
 import com.example.liberolog.repository.data.BooksDao
 import com.example.liberolog.repository.data.entity.BooksEntity
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
 import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 @Singleton
 class HomeRepository
     @Inject
     constructor(private val booksDao: BooksDao) {
-        fun getAll() = booksDao.getAll()
+        suspend fun getAll(): List<BooksEntity> {
+            return withContext(Dispatchers.IO) { booksDao.getAll() }
+        }
 
-        fun getBookFromFirebase() {
-            val db = Firebase.firestore
+        suspend fun load(): List<BooksEntity> =
+            withContext(Dispatchers.Default) {
+                val books = getBookFromFirebase()
+                return@withContext books
+            }
 
-            db.collection("Books").get().addOnSuccessListener { result ->
-                insertBook(
-                    result.documents.map { snapshot ->
-                        BooksEntity(
-                            bookId = snapshot.id,
-                            title = snapshot.data?.get("title") as String,
-                            author = snapshot.data?.get("author") as String,
-                            coverImageURL = snapshot.data?.get("coverImageURL") as String,
-                            publicationDate = snapshot.data?.get("publicationDate") as Date,
-                            totalPages = snapshot.data?.get("totalPages") as Int,
-                        )
-                    },
-                )
+        suspend fun getBookFromFirebase(): List<BooksEntity> {
+            return suspendCoroutine { continuation ->
+                Log.d("", "getBookFromFirebase.start")
+                val db = Firebase.firestore
+                val books = mutableListOf<BooksEntity>()
+
+                db.collection("Books").get().addOnSuccessListener { result ->
+                    result.documents.forEach { document ->
+                        Log.d("", "${document.id} => ${document.data}")
+                        val book =
+                            BooksEntity(
+                                bookId = document.id,
+                                title = document.getString("Title") ?: "",
+                                author = document.getString("Author") ?: "",
+                                coverImageURL = document.getString("CoverImageURL") ?: "",
+                                publicationDate =
+                                    SimpleDateFormat("yyyy-MM-dd").format(
+                                        document.getTimestamp(
+                                            "publicationDate",
+                                        )?.toDate() ?: Date(),
+                                    ),
+                                totalPages = document.getLong("TotalPages") ?: 0,
+                            )
+                        books.add(book)
+                    }
+                }.addOnCompleteListener {
+                    Log.d("", "books: $books")
+                    continuation.resume(books)
+                }
             }
         }
 
-        private fun insertBook(books: List<BooksEntity>) {
-            booksDao.insertAll(books)
+        suspend fun insertBook(books: List<BooksEntity>) {
+            return withContext(Dispatchers.IO) {
+                booksDao.insertAll(books)
+            }
         }
 
         companion object {

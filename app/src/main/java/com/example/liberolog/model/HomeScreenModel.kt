@@ -1,8 +1,8 @@
 package com.example.liberolog.model
 
 data class HomeScreenModel(
-    val monBookList: List<Book>,
-    val recBookList: List<Book>,
+    var monBookList: List<Book>? = null,
+    val recBookList: List<Book>? = null,
 )
 
 data class Book(

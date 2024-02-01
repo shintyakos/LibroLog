@@ -1,5 +1,6 @@
 package com.example.liberolog.ui.screen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,6 +32,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.liberolog.R
 import com.example.liberolog.model.Book
+import com.example.liberolog.model.HomeScreenModel
 import com.example.liberolog.viewmodel.HomeViewModel
 
 /**
@@ -47,7 +50,8 @@ fun HomeScreen(
     padding: PaddingValues,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
-    val homeModel = viewModel.homeModel.observeAsState()
+    val data: HomeScreenModel? by viewModel.model.observeAsState()
+    Log.d("HomeScreen", "data: $data")
 
     Column(
         modifier =
@@ -56,7 +60,7 @@ fun HomeScreen(
                 .fillMaxHeight()
                 .padding(padding),
     ) {
-        MainContents(homeModel.value?.monBookList, homeModel.value?.recBookList)
+        MainContents(data?.monBookList, data?.recBookList)
     }
 }
 
