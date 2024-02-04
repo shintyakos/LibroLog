@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.liberolog.model.Book
 import com.example.liberolog.model.HomeScreenModel
 import com.example.liberolog.repository.HomeRepository
+import com.example.liberolog.repository.data.entity.BooksEntity
 import com.example.liberolog.ui.state.HomeState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,13 +31,15 @@ class HomeViewModel
             viewModelScope.launch {
                 Log.d("", "loadHomeModel.start")
                 homeState.tryEmit(HomeState.LoadingState)
-//                val booksEntity: List<BooksEntity> = repository.load()
-//                Log.d("", "booksEntity: $booksEntity")
-//                if (booksEntity.isNotEmpty()) {
-//                    Log.d("", "insertBook.Start")
-//                    repository.insertBook(booksEntity)
-//                    Log.d("", "insertBook.End")
-//                }
+                if (repository.getAll().isEmpty()) {
+                    val booksEntity: List<BooksEntity> = repository.load()
+                    Log.d("", "booksEntity: $booksEntity")
+                    if (booksEntity.isNotEmpty()) {
+                        Log.d("", "insertBook.Start")
+                        repository.insertBook(booksEntity)
+                        Log.d("", "insertBook.End")
+                    }
+                }
 
                 val books = repository.getAll()
                 Log.d("", "books: $books")

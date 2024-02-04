@@ -23,12 +23,11 @@ class HomeRepository
         }
 
         suspend fun load(): List<BooksEntity> =
-            withContext(Dispatchers.Default) {
-                val books = getBookFromFirebase()
-                return@withContext books
+            withContext(Dispatchers.IO) {
+                return@withContext getBookFromFirebase()
             }
 
-        suspend fun getBookFromFirebase(): List<BooksEntity> {
+        private suspend fun getBookFromFirebase(): List<BooksEntity> {
             return suspendCoroutine { continuation ->
                 Log.d("", "getBookFromFirebase.start")
                 val db = Firebase.firestore
