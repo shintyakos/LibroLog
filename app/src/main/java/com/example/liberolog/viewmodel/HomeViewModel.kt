@@ -29,20 +29,20 @@ class HomeViewModel
 
         private fun loadHomeModel() {
             viewModelScope.launch {
-                Log.d("", "loadHomeModel.start")
+                Log.d("HomeViewModel", "loadHomeModel.start")
                 homeState.tryEmit(HomeState.LoadingState)
                 if (repository.getAll().isEmpty()) {
                     val booksEntity: List<BooksEntity> = repository.load()
-                    Log.d("", "booksEntity: $booksEntity")
+                    Log.d("HomeViewModel", "booksEntity: $booksEntity")
                     if (booksEntity.isNotEmpty()) {
-                        Log.d("", "insertBook.Start")
+                        Log.d("HomeViewModel", "insertBook.Start")
                         repository.insertBook(booksEntity)
-                        Log.d("", "insertBook.End")
+                        Log.d("HomeViewModel", "insertBook.End")
                     }
                 }
 
                 val books = repository.getAll()
-                Log.d("", "books: $books")
+                Log.d("HomeViewModel", "books: $books")
                 homeState.tryEmit(
                     HomeState.SuccessState(
                         HomeScreenModel(
@@ -57,7 +57,7 @@ class HomeViewModel
                         ),
                     ),
                 )
-                Log.d("", "loadHomeModel.End")
+                Log.d("HomeViewModel", "loadHomeModel.End")
             }
         }
     }
