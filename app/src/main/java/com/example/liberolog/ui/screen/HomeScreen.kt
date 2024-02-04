@@ -1,5 +1,6 @@
 package com.example.liberolog.ui.screen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -12,9 +13,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,6 +34,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.liberolog.R
 import com.example.liberolog.model.Book
+import com.example.liberolog.ui.state.HomeState
 import com.example.liberolog.viewmodel.HomeViewModel
 
 /**
@@ -47,8 +52,6 @@ fun HomeScreen(
     padding: PaddingValues,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
-    val homeModel = viewModel.homeModel.observeAsState()
-
     Column(
         modifier =
             Modifier
@@ -56,15 +59,23 @@ fun HomeScreen(
                 .fillMaxHeight()
                 .padding(padding),
     ) {
-        MainContents(homeModel.value?.monBookList, homeModel.value?.recBookList)
+        val homeState by viewModel.homeState.collectAsState()
+        Log.d("", "homeState: $homeState")
+
+        when (homeState) {
+            is HomeState.SuccessState -> {
+                val model = (homeState as HomeState.SuccessState).model
+                MainContents(model.monBookList)
+            }
+            else -> {
+                Text(text = "Loading...", modifier = Modifier.align(Alignment.CenterHorizontally))
+            }
+        }
     }
 }
 
 @Composable
-private fun MainContents(
-    monBooks: List<Book>?,
-    recBooks: List<Book>?,
-) {
+private fun MainContents(monBooks: List<Book>?) {
     Column {
         Row(
             modifier =
@@ -87,9 +98,7 @@ private fun MainContents(
                     ),
             )
         }
-        monBooks?.forEach {
-            CardView(it)
-        }
+        CardView(monBooks)
         Row(
             modifier =
                 Modifier
@@ -111,35 +120,36 @@ private fun MainContents(
                     ),
             )
         }
-        recBooks?.forEach {
-            CardView(it)
-        }
     }
 }
 
 @Composable
 @Suppress("ktlint:standard:max-line-length")
-private fun CardView(book: Book) {
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .height(88.dp)
-                .background(Color.White),
-    ) {
-        Image(
-            painter = rememberAsyncImagePainter(book.image),
-            contentDescription = null,
-            contentScale = ContentScale.Fit,
-            modifier = Modifier.size(150.dp),
-        )
-        Text(book.title)
+private fun CardView(books: List<Book>?) {
+    LazyColumn {
+        items(books ?: emptyList()) { book ->
+            Row(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(88.dp)
+                        .background(Color.White),
+            ) {
+                Image(
+                    painter = rememberAsyncImagePainter(book.image),
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.size(150.dp),
+                )
+                Text(book.title)
+            }
+            Spacer(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(Color(0xFFE0E0E0)),
+            )
+        }
     }
-    Spacer(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .background(Color(0xFFE0E0E0)),
-    )
 }

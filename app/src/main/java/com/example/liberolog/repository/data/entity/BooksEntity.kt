@@ -3,7 +3,6 @@ package com.example.liberolog.repository.data.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.util.Date
 
 @Entity(tableName = "books")
 data class BooksEntity(
@@ -11,6 +10,6 @@ data class BooksEntity(
     val title: String,
     val author: String,
     val coverImageURL: String,
-    val publicationDate: Date,
-    val totalPages: Int,
+    val publicationDate: String,
+    val totalPages: Long,
 )
