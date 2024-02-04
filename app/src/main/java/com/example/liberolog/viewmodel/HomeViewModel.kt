@@ -21,7 +21,7 @@ class HomeViewModel
         private val saveStateHandle: SavedStateHandle,
         private val repository: HomeRepository,
     ) : ViewModel() {
-        val homeState = MutableStateFlow<HomeState>(HomeState.StartState)
+        private val homeState = MutableStateFlow<HomeState>(HomeState.StartState)
 
         init {
             loadHomeModel()
