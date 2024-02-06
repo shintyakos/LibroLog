@@ -13,6 +13,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * `HomeViewModel` is a ViewModel class that provides the state for the `HomeScreen`.
+ * It uses Hilt for dependency injection and Coroutines for asynchronous operations.
+ *
+ * @property repository The `HomeRepository` that provides the data for the `HomeViewModel`.
+ * @property homeState The state of the `HomeScreen` as a `MutableStateFlow`.
+ */
 @HiltViewModel
 class HomeViewModel
     @Inject
@@ -25,6 +32,11 @@ class HomeViewModel
 
         val homeState = MutableStateFlow<HomeState>(HomeState.StartState)
 
+        /**
+         * `loadHomeModel` is a function that loads the data for the `HomeScreen`.
+         * It first checks if there is any data in the repository. If not, it loads the data from the network and saves it in the repository.
+         * Then it gets the data from the repository and emits a `HomeState.SuccessState` with the data.
+         */
         fun loadHomeModel() {
             viewModelScope.launch {
                 Log.d(TAG, "loadHomeModel.start")
