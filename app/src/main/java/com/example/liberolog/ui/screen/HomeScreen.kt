@@ -4,17 +4,22 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -28,6 +33,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,6 +41,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.liberolog.R
 import com.example.liberolog.model.Book
 import com.example.liberolog.ui.state.HomeState
+import com.example.liberolog.utils.HOME_SCREEN_TAG
 import com.example.liberolog.viewmodel.HomeViewModel
 
 /**
@@ -55,20 +62,37 @@ fun HomeScreen(
     Column(
         modifier =
             Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
+                .fillMaxSize()
                 .padding(padding),
     ) {
         val homeState by viewModel.homeState.collectAsState()
-        Log.d("", "homeState: $homeState")
+        Log.d(HOME_SCREEN_TAG, "homeState: $homeState")
 
         when (homeState) {
+            is HomeState.StartState -> {
+                viewModel.loadHomeModel()
+            }
+
+            is HomeState.LoadingState -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier,
+                        color = MaterialTheme.colorScheme.primary,
+                        strokeWidth = ProgressIndicatorDefaults.CircularStrokeWidth,
+                    )
+                }
+            }
+
             is HomeState.SuccessState -> {
                 val model = (homeState as HomeState.SuccessState).model
                 MainContents(model.monBookList)
             }
+
             else -> {
-                Text(text = "Loading...", modifier = Modifier.align(Alignment.CenterHorizontally))
+                Log.d(HOME_SCREEN_TAG, "Error: $homeState")
             }
         }
     }
@@ -136,12 +160,18 @@ private fun CardView(books: List<Book>?) {
                         .background(Color.White),
             ) {
                 Image(
-                    painter = rememberAsyncImagePainter(book.image),
+                    painter =
+                        rememberAsyncImagePainter(
+                            model = "https://books.google.com/books/content?id=DAjLCwAAQBAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+                        ),
+                    modifier = Modifier.fillMaxHeight().width(68.dp).padding(2.dp),
                     contentDescription = null,
                     contentScale = ContentScale.Fit,
-                    modifier = Modifier.size(150.dp),
                 )
-                Text(book.title)
+                Column(modifier = Modifier.padding(8.dp)) {
+                    Text(book.title)
+                    Text(book.author)
+                }
             }
             Spacer(
                 modifier =
@@ -152,4 +182,19 @@ private fun CardView(books: List<Book>?) {
             )
         }
     }
+}
+
+@Preview
+@Composable
+fun HomeScreenPreview() {
+    MainContents(
+        monBooks =
+            listOf(
+                Book(
+                    title = "title",
+                    author = "author",
+                    image = "https://books.google.com/books/content?id=DAjLCwAAQBAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+                ),
+            ),
+    )
 }

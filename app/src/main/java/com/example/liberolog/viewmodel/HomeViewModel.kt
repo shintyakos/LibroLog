@@ -1,7 +1,6 @@
 package com.example.liberolog.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.liberolog.model.Book
@@ -18,31 +17,30 @@ import javax.inject.Inject
 class HomeViewModel
     @Inject
     internal constructor(
-        private val saveStateHandle: SavedStateHandle,
         private val repository: HomeRepository,
     ) : ViewModel() {
-        private val homeState = MutableStateFlow<HomeState>(HomeState.StartState)
-
-        init {
-            loadHomeModel()
+        companion object {
+            private const val TAG = "HomeViewModel"
         }
 
-        private fun loadHomeModel() {
+        val homeState = MutableStateFlow<HomeState>(HomeState.StartState)
+
+        fun loadHomeModel() {
             viewModelScope.launch {
-                Log.d("HomeViewModel", "loadHomeModel.start")
+                Log.d(TAG, "loadHomeModel.start")
                 homeState.tryEmit(HomeState.LoadingState)
                 if (repository.getAll().isEmpty()) {
                     val booksEntity: List<BooksEntity> = repository.load()
-                    Log.d("HomeViewModel", "booksEntity: $booksEntity")
+                    Log.d(TAG, "booksEntity: $booksEntity")
                     if (booksEntity.isNotEmpty()) {
-                        Log.d("HomeViewModel", "insertBook.Start")
+                        Log.d(TAG, "insertBook.Start")
                         repository.insertBook(booksEntity)
-                        Log.d("HomeViewModel", "insertBook.End")
+                        Log.d(TAG, "insertBook.End")
                     }
                 }
 
                 val books = repository.getAll()
-                Log.d("HomeViewModel", "books: $books")
+                Log.d(TAG, "books: $books")
                 homeState.tryEmit(
                     HomeState.SuccessState(
                         HomeScreenModel(
@@ -57,7 +55,7 @@ class HomeViewModel
                         ),
                     ),
                 )
-                Log.d("HomeViewModel", "loadHomeModel.End")
+                Log.d(TAG, "loadHomeModel.End")
             }
         }
     }
