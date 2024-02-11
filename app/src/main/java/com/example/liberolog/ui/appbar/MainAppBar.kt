@@ -95,7 +95,9 @@ open class MainAppBar : Screen {
                 NavigationBarItem(
                     selected = currentRoute == item.route,
                     onClick = {
-                        navController.navigate(item.route)
+                        if (currentRoute != item.route) {
+                            navController.navigate(item.route)
+                        }
                     },
                     icon = { Icon(imageVector = item.icon, contentDescription = item.route) },
                     label = { Text(text = stringResource(id = item.label), maxLines = 1) },

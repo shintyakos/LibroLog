@@ -178,7 +178,7 @@ private fun CardView(books: List<Book>?) {
                     model =
                         ImageRequest.Builder(
                             LocalContext.current,
-                        ).data(book.image.replace("http://", "https://")).crossfade(false).build(),
+                        ).data(book.image).crossfade(false).build(),
                     modifier = Modifier.fillMaxHeight().width(68.dp).padding(2.dp),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,

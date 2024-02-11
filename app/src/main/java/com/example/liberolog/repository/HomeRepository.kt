@@ -54,6 +54,7 @@ class HomeRepository
                     }
                 }.addOnFailureListener { exception ->
                     Log.e(TAG, "Error getting documents: ${exception.message}")
+                    continuation.resume(emptyList())
                 }.addOnCompleteListener {
                     Log.d(TAG, "books: $books")
                     continuation.resume(books)

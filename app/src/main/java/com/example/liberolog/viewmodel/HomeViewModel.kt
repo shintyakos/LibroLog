@@ -39,35 +39,40 @@ class HomeViewModel
          */
         fun loadHomeModel() {
             viewModelScope.launch {
-                Log.d(TAG, "loadHomeModel.start")
-                homeState.tryEmit(HomeState.LoadingState)
-                if (repository.getAll().isEmpty()) {
-                    val booksEntity: List<BooksEntity> = repository.load()
-                    Log.d(TAG, "booksEntity: $booksEntity")
-                    if (booksEntity.isNotEmpty()) {
-                        Log.d(TAG, "insertBook.Start")
-                        repository.insertBook(booksEntity)
-                        Log.d(TAG, "insertBook.End")
+                try {
+                    Log.d(TAG, "loadHomeModel.start")
+                    homeState.tryEmit(HomeState.LoadingState)
+                    if (repository.getAll().isEmpty()) {
+                        val booksEntity: List<BooksEntity> = repository.load()
+                        Log.d(TAG, "booksEntity: $booksEntity")
+                        if (booksEntity.isNotEmpty()) {
+                            Log.d(TAG, "insertBook.Start")
+                            repository.insertBook(booksEntity)
+                            Log.d(TAG, "insertBook.End")
+                        }
                     }
-                }
 
-                val books = repository.getAll()
-                Log.d(TAG, "books: $books")
-                homeState.tryEmit(
-                    HomeState.SuccessState(
-                        HomeScreenModel(
-                            monBookList =
-                                books.map { book ->
-                                    Book(
-                                        title = book.title,
-                                        author = book.author,
-                                        image = book.coverImageURL,
-                                    )
-                                },
+                    val books = repository.getAll()
+                    Log.d(TAG, "books: $books")
+                    homeState.tryEmit(
+                        HomeState.SuccessState(
+                            HomeScreenModel(
+                                monBookList =
+                                    books.map { book ->
+                                        Book(
+                                            title = book.title,
+                                            author = book.author,
+                                            image = book.coverImageURL.replace("http://", "https://"),
+                                        )
+                                    },
+                            ),
                         ),
-                    ),
-                )
-                Log.d(TAG, "loadHomeModel.End")
+                    )
+                    Log.d(TAG, "loadHomeModel.End")
+                } catch (e: Exception) {
+                    Log.e(TAG, "loadHomeModel.Error: ${e.message}")
+                    homeState.tryEmit(HomeState.ErrorState)
+                }
             }
         }
     }
