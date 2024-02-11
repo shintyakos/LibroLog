@@ -1,4 +1,4 @@
-package com.example.liberolog.ui.screen
+package com.example.liberolog.ui.screen.home
 
 import android.util.Log
 import androidx.compose.foundation.background
