@@ -29,13 +29,13 @@ class HomeRepository
 
         private suspend fun getBookFromFirebase(): List<BooksEntity> {
             return suspendCoroutine { continuation ->
-                Log.d("", "getBookFromFirebase.start")
+                Log.d(TAG, "getBookFromFirebase.start")
                 val db = Firebase.firestore
                 val books = mutableListOf<BooksEntity>()
 
                 db.collection("Books").get().addOnSuccessListener { result ->
                     result.documents.forEach { document ->
-                        Log.d("", "${document.id} => ${document.data}")
+                        Log.d(TAG, "${document.id} => ${document.data}")
                         val book =
                             BooksEntity(
                                 bookId = document.id,
@@ -52,8 +52,11 @@ class HomeRepository
                             )
                         books.add(book)
                     }
+                }.addOnFailureListener { exception ->
+                    Log.e(TAG, "Error getting documents: ${exception.message}")
+                    continuation.resume(emptyList())
                 }.addOnCompleteListener {
-                    Log.d("", "books: $books")
+                    Log.d(TAG, "books: $books")
                     continuation.resume(books)
                 }
             }
@@ -66,6 +69,8 @@ class HomeRepository
         }
 
         companion object {
+            private const val TAG = "HomeRepository"
+
             @Volatile private var instance: HomeRepository? = null
 
             fun getInstance(bookListDao: BooksDao) =

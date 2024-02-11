@@ -8,4 +8,6 @@ sealed class HomeState {
     data object LoadingState : HomeState()
 
     data class SuccessState(val model: HomeScreenModel) : HomeState()
+
+    data object ErrorState : HomeState()
 }
