@@ -9,7 +9,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.liberolog.ui.appbar.HomeAppBar
+import com.example.liberolog.ui.appbar.LoginAppBar
 import com.example.liberolog.ui.screen.home.HomeScreen
+import com.example.liberolog.ui.screen.login.LoginScreen
 import com.example.liberolog.utils.NavigationItem
 
 /**
@@ -32,13 +34,16 @@ fun LiberoLogApp() {
 @Composable
 fun LiberoLogAppNavHost(navController: NavHostController) {
     val currentBackStack by navController.currentBackStackEntryAsState()
-    val screens = listOf(HomeAppBar())
+    val screens = listOf(LoginAppBar(), HomeAppBar())
 
     Scaffold(
         topBar = { screens.find { currentBackStack?.destination?.route == it.route }?.TopBar() ?: Unit },
         bottomBar = { screens.find { currentBackStack?.destination?.route == it.route }?.BottomBar(navController) ?: Unit },
     ) { padding ->
-        NavHost(navController = navController, startDestination = NavigationItem.HOME.route) {
+        NavHost(navController = navController, startDestination = NavigationItem.LOGIN.route) {
+            composable(NavigationItem.LOGIN.route) {
+                LoginScreen(padding)
+            }
             composable(NavigationItem.HOME.route) {
                 HomeScreen(padding)
             }

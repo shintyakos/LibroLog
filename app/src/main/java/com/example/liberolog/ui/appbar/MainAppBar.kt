@@ -99,7 +99,7 @@ open class MainAppBar : Screen {
                             navController.navigate(item.route)
                         }
                     },
-                    icon = { Icon(imageVector = item.icon, contentDescription = item.route) },
+                    icon = { item.icon?.let { Icon(imageVector = it, contentDescription = item.route) } },
                     label = { Text(text = stringResource(id = item.label), maxLines = 1) },
                     colors =
                         NavigationBarItemDefaults.colors(

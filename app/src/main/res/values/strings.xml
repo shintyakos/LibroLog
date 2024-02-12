@@ -15,4 +15,11 @@
     // HomeScreen
     <string name="month_book">今月の書籍</string>
     <string name="recommend_book">オススメの本</string>
+
+    // LoginScreen
+    <string name="login_title">ログイン画面</string>
+    <string name="login">ログイン</string>
+    <string name="login_email">メールアドレス</string>
+    <string name="login_password">パスワード</string>
+    <string name="login_button">ログイン</string>
 </resources>
