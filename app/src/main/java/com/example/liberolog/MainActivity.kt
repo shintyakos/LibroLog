@@ -17,9 +17,9 @@ class MainActivity : ComponentActivity() {
         try {
             Amplify.addPlugin(AWSCognitoAuthPlugin())
             Amplify.configure(applicationContext)
-            Log.d("MyAmplifyApp", "Initialized Amplify")
+            Log.d("LiberoLogApp", "Initialized Amplify")
         } catch (e: Exception) {
-            Log.e("MyAmplifyApp", "Could not initialize Amplify: ${e.message}")
+            Log.e("LiberoLogApp", "Could not initialize Amplify: ${e.message}")
         }
 
         setContent {
