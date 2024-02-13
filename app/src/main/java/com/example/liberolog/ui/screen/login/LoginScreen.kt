@@ -1,5 +1,6 @@
 package com.example.liberolog.ui.screen.login
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -19,11 +20,15 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.liberolog.R
+import com.example.liberolog.ui.state.LoginState
 import com.example.liberolog.viewmodel.LoginViewModel
 
 /**
@@ -58,16 +64,41 @@ fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
     val focusManager = LocalFocusManager.current
+    val loginState by viewModel.loginState.collectAsState()
 
-    Column(
-        modifier =
-            Modifier.fillMaxSize().padding(padding).clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = { focusManager.clearFocus() },
-            ),
-    ) {
-        MainContents(viewModel)
+    when (loginState) {
+        is LoginState.LoadingState -> {
+            Log.d("LoginScreen", "loginState: $loginState")
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center,
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier,
+                    color = MaterialTheme.colorScheme.primary,
+                    strokeWidth = ProgressIndicatorDefaults.CircularStrokeWidth,
+                )
+            }
+        }
+        is LoginState.SuccessState -> {
+            Log.d("LoginScreen", "login success")
+        }
+        else -> {
+            Log.d("LoginScreen", "loginState: $loginState")
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = { focusManager.clearFocus() },
+                        ),
+            ) {
+                MainContents(viewModel, loginState is LoginState.ErrorState)
+            }
+        }
     }
 }
 
@@ -78,7 +109,10 @@ fun LoginScreen(
  * @param viewModel The ViewModel associated with this screen.
  */
 @Composable
-fun MainContents(viewModel: LoginViewModel) {
+fun MainContents(
+    viewModel: LoginViewModel,
+    errorFlag: Boolean,
+) {
     Column(
         modifier =
             Modifier.padding(start = 20.dp, top = 20.dp, end = 20.dp),
@@ -91,22 +125,32 @@ fun MainContents(viewModel: LoginViewModel) {
                         fontSize = 12.sp,
                         fontFamily = FontFamily(Font(R.font.roboto_medium)),
                     ),
-                modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 10.dp),
             )
             BasicTextField(
                 modifier =
-                    Modifier.fillMaxWidth().background(Color.White).border(
-                        width = 1.dp,
-                        color = Color.DarkGray,
-                        shape = RoundedCornerShape(5.dp),
-                    ),
+                    Modifier
+                        .fillMaxWidth()
+                        .background(Color.White)
+                        .border(
+                            width = 1.dp,
+                            color = Color.DarkGray,
+                            shape = RoundedCornerShape(5.dp),
+                        ),
                 value = viewModel.model.email,
                 onValueChange = { viewModel.onEmailChange(it) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 decorationBox = { innerTextField ->
                     Box(
-                        modifier = Modifier.fillMaxWidth().height(30.dp).padding(start = 10.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(30.dp)
+                                .padding(start = 10.dp),
                         contentAlignment = Alignment.CenterStart,
                     ) {
                         innerTextField()
@@ -126,19 +170,31 @@ fun MainContents(viewModel: LoginViewModel) {
             )
             BasicTextField(
                 modifier =
-                    Modifier.fillMaxWidth().background(Color.White).border(
-                        width = 1.dp,
-                        color = Color.DarkGray,
-                        shape = RoundedCornerShape(5.dp),
-                    ).focusRequester(FocusRequester()),
+                    Modifier
+                        .fillMaxWidth()
+                        .background(Color.White)
+                        .border(
+                            width = 1.dp,
+                            color = Color.DarkGray,
+                            shape = RoundedCornerShape(5.dp),
+                        )
+                        .focusRequester(FocusRequester()),
                 value = viewModel.model.password,
                 onValueChange = { viewModel.onPasswordChange(it) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                visualTransformation = if (viewModel.model.passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation =
+                    if (viewModel.model.passwordVisibility) {
+                        PasswordVisualTransformation()
+                    } else {
+                        VisualTransformation.None
+                    },
                 decorationBox = { innerTextField ->
                     Box(
-                        modifier = Modifier.height(30.dp).padding(start = 10.dp),
+                        modifier =
+                            Modifier
+                                .height(30.dp)
+                                .padding(start = 10.dp),
                         contentAlignment = Alignment.CenterStart,
                     ) {
                         innerTextField()
@@ -147,7 +203,12 @@ fun MainContents(viewModel: LoginViewModel) {
                             modifier = Modifier.align(Alignment.CenterEnd),
                         ) {
                             Icon(
-                                imageVector = if (viewModel.model.passwordVisibility) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                imageVector =
+                                    if (viewModel.model.passwordVisibility) {
+                                        Icons.Filled.VisibilityOff
+                                    } else {
+                                        Icons.Filled.Visibility
+                                    },
                                 contentDescription = null,
                                 tint = Color.LightGray,
                             )
@@ -157,10 +218,18 @@ fun MainContents(viewModel: LoginViewModel) {
             )
         }
     }
-    Box(modifier = Modifier.fillMaxWidth().padding(20.dp)) {
+    Box(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+    ) {
         Button(
             onClick = { viewModel.login() },
-            modifier = Modifier.fillMaxWidth().align(Alignment.Center),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Center),
             colors =
                 ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
