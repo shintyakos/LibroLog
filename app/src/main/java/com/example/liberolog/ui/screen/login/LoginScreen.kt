@@ -8,6 +8,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -96,7 +97,7 @@ fun LoginScreen(
                             onClick = { focusManager.clearFocus() },
                         ),
             ) {
-                MainContents(viewModel, loginState is LoginState.ErrorState)
+                MainContents(viewModel, true)
             }
         }
     }
@@ -111,7 +112,7 @@ fun LoginScreen(
 @Composable
 fun MainContents(
     viewModel: LoginViewModel,
-    errorFlag: Boolean,
+    isErrorFlag: Boolean,
 ) {
     Column(
         modifier =
@@ -137,7 +138,7 @@ fun MainContents(
                         .background(Color.White)
                         .border(
                             width = 1.dp,
-                            color = Color.DarkGray,
+                            color = if (isErrorFlag) Color.Red else Color.DarkGray,
                             shape = RoundedCornerShape(5.dp),
                         ),
                 value = viewModel.model.email,
@@ -175,7 +176,7 @@ fun MainContents(
                         .background(Color.White)
                         .border(
                             width = 1.dp,
-                            color = Color.DarkGray,
+                            color = if (isErrorFlag) Color.Red else Color.DarkGray,
                             shape = RoundedCornerShape(5.dp),
                         )
                         .focusRequester(FocusRequester()),
@@ -216,6 +217,20 @@ fun MainContents(
                     }
                 },
             )
+        }
+        if (isErrorFlag) {
+            Row {
+                Text(
+                    text = stringResource(R.string.login_error),
+                    style =
+                        TextStyle(
+                            fontSize = 12.sp,
+                            fontFamily = FontFamily(Font(R.font.roboto_medium)),
+                            color = Color.Red,
+                        ),
+                    modifier = Modifier.padding(bottom = 10.dp),
+                )
+            }
         }
     }
     Box(

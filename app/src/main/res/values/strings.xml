@@ -20,6 +20,11 @@
     <string name="login_title">ログイン画面</string>
     <string name="login">ログイン</string>
     <string name="login_email">メールアドレス</string>
+    <string name="login_error_email_empty">メールアドレスを入力してください</string>
+    <string name="login_error_email_incorrect">メールアドレスが正しくありません</string>
     <string name="login_password">パスワード</string>
+    <string name="login_error_password_empty">パスワードを入力してください</string>
+    <string name="login_error_password_incorrect">パスワードが正しくありません</string>
+    <string name="login_error">ログインに失敗しました</string>
     <string name="login_button">ログイン</string>
 </resources>
