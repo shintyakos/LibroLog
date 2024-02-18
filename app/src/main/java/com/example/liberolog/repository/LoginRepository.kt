@@ -11,33 +11,23 @@ import kotlin.coroutines.suspendCoroutine
 class LoginRepository
     @Inject
     constructor() {
-        companion object {
-            private const val TAG = "LoginRepository"
-
-            @Volatile
-            private var instance: LoginRepository? = null
-
-            fun getInstance() =
-                instance ?: synchronized(this) {
-                    instance ?: LoginRepository().also { instance = it }
-                }
-        }
+        private val tag = "LoginRepository"
 
         suspend fun login(
             email: String,
             password: String,
         ): Boolean {
-            Log.d(TAG, "login.start")
+            Log.d(tag, "login.start")
             return suspendCoroutine { continuation ->
                 Amplify.Auth.signIn(
                     email,
                     password,
                     { result ->
-                        Log.d(TAG, "result: ${result.isSignedIn}")
+                        Log.d(tag, "result: ${result.isSignedIn}")
                         continuation.resume(result.isSignedIn)
                     },
                     { error ->
-                        Log.e(TAG, "Error signing in: ${error.message}")
+                        Log.e(tag, "Error signing in: ${error.message}")
                         continuation.resume(false)
                     },
                 )

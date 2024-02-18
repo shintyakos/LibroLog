@@ -18,6 +18,8 @@ import kotlin.coroutines.suspendCoroutine
 class HomeRepository
     @Inject
     constructor(private val booksDao: BooksDao) {
+        private val tag = HomeRepository::class.java.simpleName
+
         suspend fun getAll(): List<BooksEntity> {
             return withContext(Dispatchers.IO) { booksDao.getAll() }
         }
@@ -29,13 +31,13 @@ class HomeRepository
 
         private suspend fun getBookFromFirebase(): List<BooksEntity> {
             return suspendCoroutine { continuation ->
-                Log.d(TAG, "getBookFromFirebase.start")
+                Log.d(tag, "getBookFromFirebase.start")
                 val db = Firebase.firestore
                 val books = mutableListOf<BooksEntity>()
 
                 db.collection("Books").get().addOnSuccessListener { result ->
                     result.documents.forEach { document ->
-                        Log.d(TAG, "${document.id} => ${document.data}")
+                        Log.d(tag, "${document.id} => ${document.data}")
                         val book =
                             BooksEntity(
                                 bookId = document.id,
@@ -53,10 +55,10 @@ class HomeRepository
                         books.add(book)
                     }
                 }.addOnFailureListener { exception ->
-                    Log.e(TAG, "Error getting documents: ${exception.message}")
+                    Log.e(tag, "Error getting documents: ${exception.message}")
                     continuation.resume(emptyList())
                 }.addOnCompleteListener {
-                    Log.d(TAG, "books: $books")
+                    Log.d(tag, "books: $books")
                     continuation.resume(books)
                 }
             }
@@ -66,16 +68,5 @@ class HomeRepository
             return withContext(Dispatchers.IO) {
                 booksDao.insertAll(books)
             }
-        }
-
-        companion object {
-            private const val TAG = "HomeRepository"
-
-            @Volatile private var instance: HomeRepository? = null
-
-            fun getInstance(bookListDao: BooksDao) =
-                instance ?: synchronized(this) {
-                    instance ?: HomeRepository(bookListDao).also { instance = it }
-                }
         }
     }

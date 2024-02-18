@@ -13,16 +13,6 @@ import kotlin.coroutines.suspendCoroutine
 class SignUpRepository
     @Inject
     constructor() {
-        companion object {
-            private const val TAG = "SignUpRepository"
-            private var instance: SignUpRepository? = null
-
-            fun getInstance() =
-                instance ?: synchronized(this) {
-                    instance ?: SignUpRepository().also { instance = it }
-                }
-        }
-
         suspend fun signUp(model: SignUpScreenModel): Boolean {
             return suspendCoroutine { continuation ->
                 val option = AuthSignUpOptions.builder().userAttribute(AuthUserAttributeKey.email(), model.email).build()
