@@ -43,7 +43,13 @@ class LoginViewModel
             viewModelScope.launch {
                 Log.d(TAG, "login start")
                 Log.d(TAG, "userName: ${model.email}, password: ${model.password}")
+                if (model.email.isEmpty() || model.password.isEmpty()) {
+                    loginState.tryEmit(LoginState.ErrorState)
+                    return@launch
+                }
+
                 loginState.tryEmit(LoginState.LoadingState)
+
                 val result = repository.login(model.email, model.password)
                 Log.d(TAG, "result: $result")
                 if (result) {

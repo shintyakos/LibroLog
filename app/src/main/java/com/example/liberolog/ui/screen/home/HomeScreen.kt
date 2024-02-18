@@ -60,6 +60,7 @@ import com.example.liberolog.viewmodel.HomeViewModel
 )
 fun HomeScreen(
     padding: PaddingValues,
+    onClickNavigation: (String) -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     Column(

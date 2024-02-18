@@ -37,11 +37,10 @@ class LoginAppBar : Screen {
                     text = getTitle(),
                     style =
                         TextStyle(
-                           fontSize = 20.sp,
+                            fontSize = 20.sp,
                             lineHeight = 24.sp,
                             fontFamily = FontFamily(Font(R.font.roboto_medium)),
                             fontWeight = FontWeight(500),
-                            color = Color.White,
                             textAlign = TextAlign.Center,
                             shadow =
                                 Shadow(
@@ -52,7 +51,7 @@ class LoginAppBar : Screen {
                         ),
                 )
             },
-            colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary),
+            colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
             modifier = Modifier.fillMaxWidth(),
         )
     }

@@ -1,7 +1,6 @@
 package com.example.liberolog.ui.screen.login
 
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -13,20 +12,22 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -35,7 +36,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -44,11 +44,16 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.liberolog.R
+import com.example.liberolog.repository.LoginRepository
 import com.example.liberolog.ui.state.LoginState
+import com.example.liberolog.utils.NavigationItem
 import com.example.liberolog.viewmodel.LoginViewModel
 
 /**
@@ -62,6 +67,7 @@ import com.example.liberolog.viewmodel.LoginViewModel
 @Suppress("ktlint:standard:function-naming")
 fun LoginScreen(
     padding: PaddingValues,
+    navigationTo: (String) -> Unit,
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
     val focusManager = LocalFocusManager.current
@@ -76,13 +82,13 @@ fun LoginScreen(
             ) {
                 CircularProgressIndicator(
                     modifier = Modifier,
-                    color = MaterialTheme.colorScheme.primary,
                     strokeWidth = ProgressIndicatorDefaults.CircularStrokeWidth,
                 )
             }
         }
         is LoginState.SuccessState -> {
             Log.d("LoginScreen", "login success")
+            navigationTo(NavigationItem.HOME.route)
         }
         else -> {
             Log.d("LoginScreen", "loginState: $loginState")
@@ -97,7 +103,7 @@ fun LoginScreen(
                             onClick = { focusManager.clearFocus() },
                         ),
             ) {
-                MainContents(viewModel, true)
+                MainContents(viewModel, loginState is LoginState.ErrorState)
             }
         }
     }
@@ -126,6 +132,7 @@ fun MainContents(
                         fontSize = 12.sp,
                         fontFamily = FontFamily(Font(R.font.roboto_medium)),
                     ),
+                color = if (isErrorFlag) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
                 modifier =
                     Modifier
                         .fillMaxWidth()
@@ -135,10 +142,9 @@ fun MainContents(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .background(Color.White)
                         .border(
                             width = 1.dp,
-                            color = if (isErrorFlag) Color.Red else Color.DarkGray,
+                            color = if (isErrorFlag) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline,
                             shape = RoundedCornerShape(5.dp),
                         ),
                 value = viewModel.model.email,
@@ -158,6 +164,26 @@ fun MainContents(
                     }
                 },
             )
+            if (isErrorFlag) {
+                Row(modifier = Modifier.padding(top = 5.dp).height(20.dp)) {
+                    Icon(
+                        imageVector = Icons.Default.Error,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(14.dp).align(Alignment.CenterVertically),
+                    )
+                    Text(
+                        text = stringResource(R.string.login_error_email_incorrect),
+                        style =
+                            TextStyle(
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.error,
+                                fontFamily = FontFamily(Font(R.font.roboto_medium)),
+                            ),
+                        modifier = Modifier.padding(start = 5.dp),
+                    )
+                }
+            }
         }
         Column(modifier = Modifier.padding(bottom = 20.dp)) {
             Text(
@@ -166,6 +192,7 @@ fun MainContents(
                     TextStyle(
                         fontSize = 12.sp,
                         fontFamily = FontFamily(Font(R.font.roboto_medium)),
+                        color = if (isErrorFlag) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
                     ),
                 modifier = Modifier.padding(bottom = 10.dp),
             )
@@ -173,10 +200,9 @@ fun MainContents(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .background(Color.White)
                         .border(
                             width = 1.dp,
-                            color = if (isErrorFlag) Color.Red else Color.DarkGray,
+                            color = if (isErrorFlag) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline,
                             shape = RoundedCornerShape(5.dp),
                         )
                         .focusRequester(FocusRequester()),
@@ -211,12 +237,32 @@ fun MainContents(
                                         Icons.Filled.Visibility
                                     },
                                 contentDescription = null,
-                                tint = Color.LightGray,
+                                tint = MaterialTheme.colorScheme.onSurface,
                             )
                         }
                     }
                 },
             )
+            if (isErrorFlag) {
+                Row(modifier = Modifier.padding(top = 5.dp).height(20.dp)) {
+                    Icon(
+                        imageVector = Icons.Default.Error,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(14.dp).align(Alignment.CenterVertically),
+                    )
+                    Text(
+                        text = stringResource(R.string.login_error_password_incorrect),
+                        style =
+                            TextStyle(
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.error,
+                                fontFamily = FontFamily(Font(R.font.roboto_medium)),
+                            ),
+                        modifier = Modifier.padding(start = 5.dp),
+                    )
+                }
+            }
         }
         if (isErrorFlag) {
             Row {
@@ -224,9 +270,9 @@ fun MainContents(
                     text = stringResource(R.string.login_error),
                     style =
                         TextStyle(
-                            fontSize = 12.sp,
+                            fontSize = 24.sp,
+                            color = MaterialTheme.colorScheme.error,
                             fontFamily = FontFamily(Font(R.font.roboto_medium)),
-                            color = Color.Red,
                         ),
                     modifier = Modifier.padding(bottom = 10.dp),
                 )
@@ -245,15 +291,48 @@ fun MainContents(
                 Modifier
                     .fillMaxWidth()
                     .align(Alignment.Center),
-            colors =
-                ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = Color.White,
-                    disabledContainerColor = Color.LightGray,
-                    disabledContentColor = Color.LightGray,
-                ),
         ) {
             Text(text = stringResource(R.string.login_button))
         }
+    }
+
+    Column(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+    ) {
+        TextButton(onClick = { /*TODO*/ }) {
+            Text(
+                text = stringResource(id = R.string.login_register),
+                textAlign = TextAlign.Center,
+                style =
+                    TextStyle(
+                        fontSize = 12.sp,
+                        fontFamily = FontFamily(Font(R.font.roboto_medium)),
+                    ),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+        TextButton(onClick = { /*TODO*/ }) {
+            Text(
+                text = stringResource(id = R.string.login_re_register_password),
+                textAlign = TextAlign.Center,
+                style =
+                    TextStyle(
+                        fontSize = 12.sp,
+                        fontFamily = FontFamily(Font(R.font.roboto_medium))
+                    ),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+}
+
+@Preview(device = Devices.PIXEL_6, showBackground = true)
+@Composable
+fun PreMainContents() {
+    Column {
+        MainContents(LoginViewModel(repository = LoginRepository()), false)
     }
 }

@@ -1,5 +1,6 @@
 package com.example.liberolog
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -13,6 +14,11 @@ import com.example.liberolog.ui.appbar.LoginAppBar
 import com.example.liberolog.ui.screen.home.HomeScreen
 import com.example.liberolog.ui.screen.login.LoginScreen
 import com.example.liberolog.utils.NavigationItem
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
+private var paddingValues: PaddingValues? = null
 
 /**
  * `LiberoLogApp` is a Composable function that sets up the navigation for the application.
@@ -40,13 +46,28 @@ fun LiberoLogAppNavHost(navController: NavHostController) {
         topBar = { screens.find { currentBackStack?.destination?.route == it.route }?.TopBar() ?: Unit },
         bottomBar = { screens.find { currentBackStack?.destination?.route == it.route }?.BottomBar(navController) ?: Unit },
     ) { padding ->
+        paddingValues = padding
         NavHost(navController = navController, startDestination = NavigationItem.LOGIN.route) {
             composable(NavigationItem.LOGIN.route) {
-                LoginScreen(padding)
+                LoginScreen(padding, navigationTo(navController))
             }
             composable(NavigationItem.HOME.route) {
-                HomeScreen(padding)
+                HomeScreen(padding, navigationTo(navController))
             }
         }
     }
 }
+
+fun navigationTo(navController: NavHostController): (String) -> Unit =
+    { navScreen ->
+        CoroutineScope(Dispatchers.Main).launch {
+            when (navScreen) {
+                NavigationItem.LOGIN.route -> {
+                    navController.navigate(NavigationItem.LOGIN.route)
+                }
+                NavigationItem.HOME.route -> {
+                    navController.navigate(NavigationItem.HOME.route)
+                }
+            }
+        }
+    }
