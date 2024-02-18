@@ -1,5 +1,6 @@
 package com.example.liberolog
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -9,8 +10,17 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.liberolog.ui.appbar.HomeAppBar
+import com.example.liberolog.ui.appbar.LoginAppBar
+import com.example.liberolog.ui.appbar.SignUpAppBar
 import com.example.liberolog.ui.screen.home.HomeScreen
+import com.example.liberolog.ui.screen.login.LoginScreen
+import com.example.liberolog.ui.screen.signup.SignUpScreen
 import com.example.liberolog.utils.NavigationItem
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
+private var paddingValues: PaddingValues? = null
 
 /**
  * `LiberoLogApp` is a Composable function that sets up the navigation for the application.
@@ -32,16 +42,40 @@ fun LiberoLogApp() {
 @Composable
 fun LiberoLogAppNavHost(navController: NavHostController) {
     val currentBackStack by navController.currentBackStackEntryAsState()
-    val screens = listOf(HomeAppBar())
+    val screens = listOf(LoginAppBar(), SignUpAppBar(), HomeAppBar())
 
     Scaffold(
         topBar = { screens.find { currentBackStack?.destination?.route == it.route }?.TopBar() ?: Unit },
         bottomBar = { screens.find { currentBackStack?.destination?.route == it.route }?.BottomBar(navController) ?: Unit },
     ) { padding ->
-        NavHost(navController = navController, startDestination = NavigationItem.HOME.route) {
+        paddingValues = padding
+        NavHost(navController = navController, startDestination = NavigationItem.LOGIN.route) {
+            composable(NavigationItem.LOGIN.route) {
+                LoginScreen(padding, navigationTo(navController))
+            }
+            composable(NavigationItem.SIGNUP.route) {
+                SignUpScreen(padding, navigationTo(navController))
+            }
             composable(NavigationItem.HOME.route) {
-                HomeScreen(padding)
+                HomeScreen(padding, navigationTo(navController))
             }
         }
     }
 }
+
+fun navigationTo(navController: NavHostController): (String) -> Unit =
+    { navScreen ->
+        CoroutineScope(Dispatchers.Main).launch {
+            when (navScreen) {
+                NavigationItem.LOGIN.route -> {
+                    navController.navigate(NavigationItem.LOGIN.route)
+                }
+                NavigationItem.SIGNUP.route -> {
+                    navController.navigate(NavigationItem.SIGNUP.route)
+                }
+                NavigationItem.HOME.route -> {
+                    navController.navigate(NavigationItem.HOME.route)
+                }
+            }
+        }
+    }

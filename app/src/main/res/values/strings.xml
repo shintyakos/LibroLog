@@ -2,7 +2,7 @@
     <string name="app_name">LiberoLog</string>
 
     // MainActivity
-    <string name="home">home</string>
+    <string name="home">ホーム</string>
     <string name="home_title">読書管理アプリ</string>
     <string name="home_icons_menu">Menu</string>
     <string name="home_icons_settings">Settings</string>
@@ -15,4 +15,29 @@
     // HomeScreen
     <string name="month_book">今月の書籍</string>
     <string name="recommend_book">オススメの本</string>
+
+    // LoginScreen
+    <string name="login">ログイン</string>
+    <string name="login_title">ログイン画面</string>
+    <string name="login_email">メールアドレス</string>
+    <string name="login_error_email_incorrect">メールアドレスが正しくありません</string>
+    <string name="login_password">パスワード</string>
+    <string name="login_error_password_incorrect">パスワードが正しくありません</string>
+    <string name="login_error">ログインに失敗しました</string>
+    <string name="login_button">ログイン</string>
+    <string name="login_register">新規登録はこちら</string>
+    <string name="login_re_register_password">パスワードを忘れた方はこちら</string>
+
+    // SignUpScreen
+    <string name="signup">新規登録</string>
+    <string name="signup_title">新規登録画面</string>
+    <string name="signup_email">メールアドレス</string>
+    <string name="signup_error_email_incorrect">メールアドレスが正しくありません</string>
+    <string name="signup_password">パスワード</string>
+    <string name="signup_error_password_incorrect">パスワードが正しくありません</string>
+    <string name="signup_password_confirm">パスワード確認</string>
+    <string name="signup_error_password_confirm_incorrect">パスワードが正しくありません</string>
+    <string name="birthday">生年月日</string>
+    <string name="signup_button">新規登録</string>
+
 </resources>
