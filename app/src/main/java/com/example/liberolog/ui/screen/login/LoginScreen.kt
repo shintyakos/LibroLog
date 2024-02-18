@@ -103,7 +103,7 @@ fun LoginScreen(
                             onClick = { focusManager.clearFocus() },
                         ),
             ) {
-                MainContents(viewModel, loginState is LoginState.ErrorState)
+                MainContents(viewModel, navigationTo, loginState is LoginState.ErrorState)
             }
         }
     }
@@ -118,6 +118,7 @@ fun LoginScreen(
 @Composable
 fun MainContents(
     viewModel: LoginViewModel,
+    navigationTo: (String) -> Unit,
     isErrorFlag: Boolean,
 ) {
     Column(
@@ -146,7 +147,8 @@ fun MainContents(
                             width = 1.dp,
                             color = if (isErrorFlag) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline,
                             shape = RoundedCornerShape(5.dp),
-                        ),
+                        )
+                        .focusRequester(FocusRequester()),
                 value = viewModel.model.email,
                 onValueChange = { viewModel.onEmailChange(it) },
                 singleLine = true,
@@ -302,7 +304,7 @@ fun MainContents(
                 .fillMaxWidth()
                 .padding(20.dp),
     ) {
-        TextButton(onClick = { /*TODO*/ }) {
+        TextButton(onClick = { navigationTo(NavigationItem.SIGNUP.route) }) {
             Text(
                 text = stringResource(id = R.string.login_register),
                 textAlign = TextAlign.Center,
@@ -333,6 +335,6 @@ fun MainContents(
 @Composable
 fun PreMainContents() {
     Column {
-        MainContents(LoginViewModel(repository = LoginRepository()), false)
+        MainContents(LoginViewModel(repository = LoginRepository()), {}, false)
     }
 }

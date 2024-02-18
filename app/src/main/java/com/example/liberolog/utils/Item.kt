@@ -13,6 +13,7 @@ enum class NavigationItem(
     val label: Int,
 ) {
     LOGIN(route = "login", label = R.string.login),
+    SIGNUP(route = "signup", label = R.string.signup),
     HOME(route = "home", icon = Icons.Filled.Home, label = R.string.nav_home),
     BOOK_LIST(route = "bookList", icon = Icons.Filled.List, label = R.string.nav_book_list),
     COMMUNITY(route = "community", icon = Icons.Filled.Person, label = R.string.nav_community),

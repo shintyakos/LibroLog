@@ -11,8 +11,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.liberolog.ui.appbar.HomeAppBar
 import com.example.liberolog.ui.appbar.LoginAppBar
+import com.example.liberolog.ui.appbar.SignUpAppBar
 import com.example.liberolog.ui.screen.home.HomeScreen
 import com.example.liberolog.ui.screen.login.LoginScreen
+import com.example.liberolog.ui.screen.signup.SignUpScreen
 import com.example.liberolog.utils.NavigationItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -40,7 +42,7 @@ fun LiberoLogApp() {
 @Composable
 fun LiberoLogAppNavHost(navController: NavHostController) {
     val currentBackStack by navController.currentBackStackEntryAsState()
-    val screens = listOf(LoginAppBar(), HomeAppBar())
+    val screens = listOf(LoginAppBar(), SignUpAppBar(), HomeAppBar())
 
     Scaffold(
         topBar = { screens.find { currentBackStack?.destination?.route == it.route }?.TopBar() ?: Unit },
@@ -50,6 +52,9 @@ fun LiberoLogAppNavHost(navController: NavHostController) {
         NavHost(navController = navController, startDestination = NavigationItem.LOGIN.route) {
             composable(NavigationItem.LOGIN.route) {
                 LoginScreen(padding, navigationTo(navController))
+            }
+            composable(NavigationItem.SIGNUP.route) {
+                SignUpScreen(padding, navigationTo(navController))
             }
             composable(NavigationItem.HOME.route) {
                 HomeScreen(padding, navigationTo(navController))
@@ -64,6 +69,9 @@ fun navigationTo(navController: NavHostController): (String) -> Unit =
             when (navScreen) {
                 NavigationItem.LOGIN.route -> {
                     navController.navigate(NavigationItem.LOGIN.route)
+                }
+                NavigationItem.SIGNUP.route -> {
+                    navController.navigate(NavigationItem.SIGNUP.route)
                 }
                 NavigationItem.HOME.route -> {
                     navController.navigate(NavigationItem.HOME.route)
