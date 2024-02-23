@@ -31,6 +31,7 @@
     // SignUpScreen
     <string name="signup">新規登録</string>
     <string name="signup_title">新規登録画面</string>
+    <string name="signup_username">ユーザー名</string>
     <string name="signup_email">メールアドレス</string>
     <string name="signup_error_email_incorrect">メールアドレスが正しくありません</string>
     <string name="signup_password">パスワード</string>
@@ -39,5 +40,8 @@
     <string name="signup_error_password_confirm_incorrect">パスワードが正しくありません</string>
     <string name="birthday">生年月日</string>
     <string name="signup_button">新規登録</string>
-
+    <string name="confirm_signup_code">認証コードを入力</string>
+    <string name="confirm_signup_code_description">入力したメールアドレス宛（%s）に認証コードを送信しました</string>
+    <string name="confirm_signup_send_code">認証する</string>
+    <string name="confirm_signup_re_send_code">再送信</string>
 </resources>

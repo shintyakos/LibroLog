@@ -27,7 +27,7 @@ class HomeViewModel
         private val repository: HomeRepository,
     ) : ViewModel() {
         companion object {
-            private const val TAG = "HomeViewModel"
+            private val TAG = HomeViewModel::class.java.name
         }
 
         val homeState = MutableStateFlow<HomeState>(HomeState.StartState)

@@ -17,6 +17,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -30,14 +31,13 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.liberolog.R
-import com.example.liberolog.repository.SignUpRepository
 import com.example.liberolog.ui.state.SignUpState
+import com.example.liberolog.utils.NavigationItem
 import com.example.liberolog.viewmodel.SignUpViewModel
 
 @Composable
@@ -61,21 +61,71 @@ fun SignUpScreen(
                 )
             }
         }
-        is SignUpState.SuccessState -> {
+
+        is SignUpState.SuccessFromSignUpState -> {
+            ConfirmSignUpContents(viewModel)
         }
+
+        is SignUpState.SuccessFromConfirmSignUpState -> {
+            navigationTo(NavigationItem.LOGIN.route)
+        }
+
+        is SignUpState.ErrorFromConfirmSignUpState -> {
+            ConfirmSignUpContents(viewModel)
+        }
+
         else -> {
             Column(modifier = Modifier.padding(padding)) {
-                MainContents(viewModel, navigationTo)
+                MainContents(viewModel)
             }
         }
     }
 }
 
 @Composable
-fun MainContents(
-    viewModel: SignUpViewModel,
-    navigationTo: (String) -> Unit,
-) {
+fun MainContents(viewModel: SignUpViewModel) {
+    Column(modifier = Modifier.padding(20.dp)) {
+        Column(modifier = Modifier.padding(bottom = 20.dp)) {
+            Text(
+                text = stringResource(id = R.string.signup_username),
+                style =
+                    TextStyle(
+                        fontSize = 12.sp,
+                        fontFamily = FontFamily(Font(R.font.roboto_medium)),
+                    ),
+                modifier = Modifier.padding(bottom = 10.dp),
+            )
+            BasicTextField(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.outline,
+                            shape = RoundedCornerShape(5.dp),
+                        )
+                        .focusRequester(FocusRequester()),
+                value = viewModel.getUserName(),
+                onValueChange = { viewModel.onUserNameChange(it) },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                visualTransformation = VisualTransformation.None,
+                decorationBox = { innerTextField ->
+                    Box(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(30.dp)
+                                .padding(start = 10.dp),
+                        contentAlignment = Alignment.CenterStart,
+                    ) {
+                        innerTextField()
+                    }
+                },
+            )
+        }
+    }
+
     Column(modifier = Modifier.padding(20.dp)) {
         Column(modifier = Modifier.padding(bottom = 20.dp)) {
             Text(
@@ -116,6 +166,7 @@ fun MainContents(
                 },
             )
         }
+
         Column(modifier = Modifier.padding(bottom = 20.dp)) {
             Text(
                 text = stringResource(id = R.string.signup_password),
@@ -155,6 +206,7 @@ fun MainContents(
                 },
             )
         }
+
         Column(modifier = Modifier.padding(bottom = 20.dp)) {
             Text(
                 text = stringResource(id = R.string.signup_password_confirm),
@@ -194,11 +246,11 @@ fun MainContents(
                 },
             )
         }
+
         Box {
             Button(
                 onClick = {
                     viewModel.signUp()
-                    navigationTo("")
                 },
                 modifier = Modifier.fillMaxWidth().align(Alignment.Center),
             ) {
@@ -208,10 +260,83 @@ fun MainContents(
     }
 }
 
-@Preview(device = Devices.PIXEL_6, showBackground = true)
 @Composable
-fun SignUpScreenPreview() {
-    Column(modifier = Modifier.padding(16.dp)) {
-        MainContents(viewModel = SignUpViewModel(SignUpRepository()), {})
+fun ConfirmSignUpContents(viewModel: SignUpViewModel) {
+    Column(modifier = Modifier.padding(20.dp)) {
+        Column(modifier = Modifier.padding(bottom = 36.dp)) {
+            Text(
+                text = stringResource(id = R.string.confirm_signup_code),
+                style =
+                    TextStyle(
+                        fontSize = 24.sp,
+                        fontFamily = FontFamily(Font(R.font.roboto_medium)),
+                    ),
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            Text(
+                text = stringResource(id = R.string.confirm_signup_code_description, viewModel.getEmail()),
+                style =
+                    TextStyle(
+                        fontSize = 12.sp,
+                        fontFamily = FontFamily(Font(R.font.roboto_medium)),
+                    ),
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                minLines = 1,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+        BasicTextField(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .border(
+                        width = 1.dp,
+                        color = androidx.compose.ui.graphics.Color.Black,
+                    ),
+            value = viewModel.getCode(),
+            onValueChange = { viewModel.onCodeChange(it) },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            visualTransformation = VisualTransformation.None,
+            decorationBox = { innerTextField ->
+                Box(
+                    modifier = Modifier.height(28.dp).fillMaxWidth().padding(start = 10.dp),
+                    contentAlignment = Alignment.CenterStart,
+                ) {
+                    innerTextField()
+                }
+            },
+        )
+        Button(
+            onClick = { viewModel.confirmSignUp() },
+            modifier = Modifier.fillMaxWidth().padding(top = 36.dp),
+        ) {
+            Text(
+                text = stringResource(id = R.string.confirm_signup_send_code),
+                style =
+                    TextStyle(
+                        fontSize = 20.sp,
+                        fontFamily = FontFamily(Font(R.font.roboto_medium)),
+                    ),
+            )
+        }
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center,
+        ) {
+            TextButton(onClick = { /*TODO*/ }) {
+                Text(
+                    text = stringResource(id = R.string.confirm_signup_re_send_code),
+                    style =
+                        TextStyle(
+                            fontSize = 16.sp,
+                            fontFamily = FontFamily(Font(R.font.roboto_medium)),
+                        ),
+                )
+            }
+        }
     }
 }
