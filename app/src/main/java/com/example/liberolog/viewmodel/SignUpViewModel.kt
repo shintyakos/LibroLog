@@ -2,6 +2,7 @@ package com.example.liberolog.viewmodel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.liberolog.model.SignUpScreenModel
@@ -22,7 +23,8 @@ class SignUpViewModel
             private val TAG = SignUpViewModel::class.java.name
         }
 
-        private val model by mutableStateOf(SignUpScreenModel())
+        var model by mutableStateOf(SignUpScreenModel())
+            private set
         val state = MutableStateFlow<SignUpState>(SignUpState.StartState)
 
         fun getUserName(): String {
@@ -30,7 +32,7 @@ class SignUpViewModel
         }
 
         fun onUserNameChange(userName: String) {
-            this.model.userName = userName
+            model = model.copy(userName = userName)
         }
 
         fun getEmail(): String {
@@ -38,7 +40,7 @@ class SignUpViewModel
         }
 
         fun onEmailChange(email: String) {
-            this.model.email = email
+            model = model.copy(email = email)
         }
 
         fun getPassword(): String {
@@ -46,7 +48,7 @@ class SignUpViewModel
         }
 
         fun onPasswordChange(password: String) {
-            this.model.password = password
+            model = model.copy(password = password)
         }
 
         fun getConfirmPassword(): String {
@@ -54,7 +56,7 @@ class SignUpViewModel
         }
 
         fun onConfirmPasswordChange(confirmPassword: String) {
-            this.model.confirmPassword = confirmPassword
+            model = model.copy(confirmPassword = confirmPassword)
         }
 
         fun getCode(): String {
@@ -62,7 +64,7 @@ class SignUpViewModel
         }
 
         fun onCodeChange(code: String) {
-            this.model.code = code
+            model = model.copy(code = code)
         }
 
         fun signUp() {
@@ -82,8 +84,9 @@ class SignUpViewModel
                 if (result) {
                     val user =
                         hashMapOf(
-                            "userName" to model.userName,
-                            "email" to model.email,
+                            "UserName" to model.userName,
+                            "Email" to model.email,
+                            "birthDate" to model.birthDay,
                         )
 
                     if (signUpRepository.addUser(user)) {

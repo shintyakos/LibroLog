@@ -304,29 +304,37 @@ fun MainContents(
                 .fillMaxWidth()
                 .padding(20.dp),
     ) {
-        TextButton(onClick = { navigationTo(NavigationItem.SIGNUP.route) }) {
-            Text(
-                text = stringResource(id = R.string.login_register),
-                textAlign = TextAlign.Center,
-                style =
-                    TextStyle(
-                        fontSize = 12.sp,
-                        fontFamily = FontFamily(Font(R.font.roboto_medium)),
-                    ),
-                modifier = Modifier.fillMaxWidth(),
-            )
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center,
+        ) {
+            TextButton(onClick = { navigationTo(NavigationItem.SIGNUP.route) }) {
+                Text(
+                    text = stringResource(id = R.string.login_register),
+                    textAlign = TextAlign.Center,
+                    style =
+                        TextStyle(
+                            fontSize = 12.sp,
+                            fontFamily = FontFamily(Font(R.font.roboto_medium)),
+                        ),
+                )
+            }
         }
-        TextButton(onClick = { /*TODO*/ }) {
-            Text(
-                text = stringResource(id = R.string.login_re_register_password),
-                textAlign = TextAlign.Center,
-                style =
-                    TextStyle(
-                        fontSize = 12.sp,
-                        fontFamily = FontFamily(Font(R.font.roboto_medium))
-                    ),
-                modifier = Modifier.fillMaxWidth(),
-            )
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center,
+        ) {
+            TextButton(onClick = { /*TODO*/ }) {
+                Text(
+                    text = stringResource(id = R.string.login_re_register_password),
+                    textAlign = TextAlign.Center,
+                    style =
+                        TextStyle(
+                            fontSize = 12.sp,
+                            fontFamily = FontFamily(Font(R.font.roboto_medium)),
+                        ),
+                )
+            }
         }
     }
 }
