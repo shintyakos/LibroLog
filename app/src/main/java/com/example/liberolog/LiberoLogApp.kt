@@ -42,7 +42,12 @@ fun LiberoLogApp() {
 @Composable
 fun LiberoLogAppNavHost(navController: NavHostController) {
     val currentBackStack by navController.currentBackStackEntryAsState()
-    val screens = listOf(LoginAppBar(), SignUpAppBar(), HomeAppBar())
+    val screens =
+        listOf(
+            LoginAppBar(),
+            SignUpAppBar(),
+            HomeAppBar(),
+        )
 
     Scaffold(
         topBar = { screens.find { currentBackStack?.destination?.route == it.route }?.TopBar() ?: Unit },

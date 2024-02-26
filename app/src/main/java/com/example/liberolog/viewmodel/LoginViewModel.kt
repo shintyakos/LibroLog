@@ -19,7 +19,7 @@ class LoginViewModel
     @Inject
     internal constructor(val repository: LoginRepository) : ViewModel() {
         companion object {
-            val TAG = "LoginViewModel"
+            private val TAG = LoginViewModel::class.java.name
         }
 
         val loginState = MutableStateFlow<LoginState>(LoginState.StartState)

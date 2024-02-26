@@ -3,6 +3,7 @@ package com.example.liberolog.di
 import android.content.Context
 import com.example.liberolog.repository.data.AppDatabase
 import com.example.liberolog.repository.data.BooksDao
+import com.example.liberolog.repository.data.UserDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,5 +25,10 @@ class DatabaseModule {
     @Provides
     fun provideBookListDao(appDatabase: AppDatabase): BooksDao {
         return appDatabase.booksDao()
+    }
+
+    @Provides
+    fun provideUserDao(appDatabase: AppDatabase): UserDao {
+        return appDatabase.userDao()
     }
 }
