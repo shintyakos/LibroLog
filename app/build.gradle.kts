@@ -98,6 +98,6 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.amplifyframework:aws-auth-cognito:2.14.10")
-    implementation("androidx.compose.material:material-icons-core:1.6.1")
-    implementation("androidx.compose.material:material-icons-extended:1.6.1")
+    implementation("androidx.compose.material:material-icons-core:1.6.2")
+    implementation("androidx.compose.material:material-icons-extended:1.6.2")
 }
