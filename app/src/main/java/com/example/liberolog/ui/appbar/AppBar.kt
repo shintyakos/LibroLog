@@ -1,5 +1,6 @@
 package com.example.liberolog.ui.appbar
 
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.MaterialTheme
@@ -16,6 +17,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.liberolog.R
 
 open class AppBar : Screen {
@@ -27,12 +29,16 @@ open class AppBar : Screen {
         return ""
     }
 
-    open fun getNavigationIcon(): @Composable () -> Unit {
+    open fun getNavigationIcon(navController: NavHostController?): @Composable () -> Unit {
+        return {}
+    }
+
+    open fun getActions(navController: NavHostController?): @Composable RowScope.() -> Unit {
         return {}
     }
 
     @Composable
-    override fun TopBar() {
+    override fun TopBar(navController: NavHostController?) {
         CenterAlignedTopAppBar(
             title = {
                 Text(
@@ -55,7 +61,8 @@ open class AppBar : Screen {
             },
             colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
             modifier = Modifier.fillMaxWidth(),
-            navigationIcon = getNavigationIcon(),
+            actions = getActions(navController),
+            navigationIcon = getNavigationIcon(navController),
         )
     }
 }

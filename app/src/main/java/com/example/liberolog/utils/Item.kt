@@ -15,6 +15,7 @@ enum class NavigationItem(
     LOGIN(route = "login", label = R.string.login),
     SIGNUP(route = "signup", label = R.string.signup),
     HOME(route = "home", icon = Icons.Filled.Home, label = R.string.nav_home),
+    ADD_BOOK(route = "addBook", label = R.string.nav_add_book),
     BOOK_LIST(route = "bookList", icon = Icons.Filled.List, label = R.string.nav_book_list),
     COMMUNITY(route = "community", icon = Icons.Filled.Person, label = R.string.nav_community),
 }

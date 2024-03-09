@@ -11,10 +11,14 @@
     <string name="nav_home">ホーム</string>
     <string name="nav_book_list">本棚</string>
     <string name="nav_community">コミュニティ</string>
+    <string name="nav_add_book">本を追加</string>
 
     // HomeScreen
     <string name="month_book">今月の書籍</string>
     <string name="recommend_book">オススメの本</string>
+
+    // AddBookScreen
+    <string name="add_book_title">本を追加</string>
 
     // LoginScreen
     <string name="login">ログイン</string>

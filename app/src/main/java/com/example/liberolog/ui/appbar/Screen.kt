@@ -10,8 +10,11 @@ interface Screen {
     fun getTitle(): String
 
     @Composable
-    fun TopBar() {}
+    fun TopBar(navController: NavHostController? = null) {}
 
     @Composable
-    fun BottomBar(navController: NavHostController) {}
+    fun BottomBar(navController: NavHostController): Unit? = null
+
+    @Composable
+    fun FloatingButton(navController: NavHostController): Unit? = null
 }

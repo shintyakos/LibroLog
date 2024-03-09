@@ -7,6 +7,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavHostController
 import com.example.liberolog.R
 import com.example.liberolog.utils.NavigationItem
 
@@ -14,7 +15,7 @@ class LoginAppBar : AppBar() {
     override val route: String
         get() = NavigationItem.LOGIN.route
 
-    override fun getNavigationIcon(): @Composable () -> Unit {
+    override fun getNavigationIcon(navController: NavHostController?): @Composable () -> Unit {
         return {
             IconButton(onClick = { /*TODO*/ }) {
                 Icon(

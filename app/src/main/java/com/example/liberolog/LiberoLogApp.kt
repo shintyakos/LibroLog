@@ -9,9 +9,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.liberolog.ui.appbar.AddBookAppBar
 import com.example.liberolog.ui.appbar.HomeAppBar
 import com.example.liberolog.ui.appbar.LoginAppBar
 import com.example.liberolog.ui.appbar.SignUpAppBar
+import com.example.liberolog.ui.screen.addbook.AddBookScreen
 import com.example.liberolog.ui.screen.home.HomeScreen
 import com.example.liberolog.ui.screen.login.LoginScreen
 import com.example.liberolog.ui.screen.signup.SignUpScreen
@@ -47,22 +49,38 @@ fun LiberoLogAppNavHost(navController: NavHostController) {
             LoginAppBar(),
             SignUpAppBar(),
             HomeAppBar(),
+            AddBookAppBar(),
         )
 
     Scaffold(
-        topBar = { screens.find { currentBackStack?.destination?.route == it.route }?.TopBar() ?: Unit },
+        topBar = { screens.find { currentBackStack?.destination?.route == it.route }?.TopBar(navController) ?: Unit },
         bottomBar = { screens.find { currentBackStack?.destination?.route == it.route }?.BottomBar(navController) ?: Unit },
+        floatingActionButton = {
+            screens.find { currentBackStack?.destination?.route == it.route }
+                ?.FloatingButton(navController) ?: Unit
+        },
     ) { padding ->
         paddingValues = padding
-        NavHost(navController = navController, startDestination = NavigationItem.LOGIN.route) {
-            composable(NavigationItem.LOGIN.route) {
+        NavHost(navController = navController, startDestination = NavigationItem.HOME.route) {
+            composable(
+                route = NavigationItem.LOGIN.route,
+            ) {
                 LoginScreen(padding, navigationTo(navController))
             }
-            composable(NavigationItem.SIGNUP.route) {
+            composable(
+                route = NavigationItem.SIGNUP.route,
+            ) {
                 SignUpScreen(padding, navigationTo(navController))
             }
-            composable(NavigationItem.HOME.route) {
+            composable(
+                route = NavigationItem.HOME.route,
+            ) {
                 HomeScreen(padding, navigationTo(navController))
+            }
+            composable(
+                route = NavigationItem.ADD_BOOK.route,
+            ) {
+                AddBookScreen(padding)
             }
         }
     }
