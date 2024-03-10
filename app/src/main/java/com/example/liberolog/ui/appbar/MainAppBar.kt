@@ -129,7 +129,7 @@ open class MainAppBar : Screen {
             shape = CircleShape,
             containerColor = MaterialTheme.colorScheme.primary,
         ) {
-            Icon(imageVector = Icons.Filled.Add, contentDescription = "Add new book item")
+            Icon(imageVector = Icons.Filled.Add, contentDescription = stringResource(id = R.string.home_floating_button_add_book))
         }
     }
 }

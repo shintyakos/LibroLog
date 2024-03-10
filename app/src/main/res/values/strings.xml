@@ -6,6 +6,7 @@
     <string name="home_title">読書管理アプリ</string>
     <string name="home_icons_menu">Menu</string>
     <string name="home_icons_settings">Settings</string>
+    <string name="home_floating_button_add_book">本を追加</string>
 
     // NavigationBar
     <string name="nav_home">ホーム</string>
@@ -19,6 +20,8 @@
 
     // AddBookScreen
     <string name="add_book_title">本を追加</string>
+    <string name="add_book_tab_isbn">ISBN</string>
+    <string name="add_book_tab_title">タイトル</string>
 
     // LoginScreen
     <string name="login">ログイン</string>

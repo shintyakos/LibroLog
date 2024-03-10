@@ -53,8 +53,12 @@ fun LiberoLogAppNavHost(navController: NavHostController) {
         )
 
     Scaffold(
-        topBar = { screens.find { currentBackStack?.destination?.route == it.route }?.TopBar(navController) ?: Unit },
-        bottomBar = { screens.find { currentBackStack?.destination?.route == it.route }?.BottomBar(navController) ?: Unit },
+        topBar = {
+            screens.find { currentBackStack?.destination?.route == it.route }?.TopBar(navController) ?: Unit
+        },
+        bottomBar = {
+            screens.find { currentBackStack?.destination?.route == it.route }?.BottomBar(navController) ?: Unit
+        },
         floatingActionButton = {
             screens.find { currentBackStack?.destination?.route == it.route }
                 ?.FloatingButton(navController) ?: Unit
