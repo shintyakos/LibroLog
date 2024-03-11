@@ -166,7 +166,7 @@ private fun MainContents(monBooks: List<Book>?) {
 @Composable
 @Suppress("ktlint:standard:max-line-length")
 private fun CardView(books: List<Book>?) {
-    LazyColumn {
+    LazyColumn(modifier = Modifier.padding(start = 10.dp)) {
         items(books ?: emptyList()) { book ->
             Row(
                 modifier =

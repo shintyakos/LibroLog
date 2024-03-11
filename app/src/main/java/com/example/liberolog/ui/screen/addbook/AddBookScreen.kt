@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -33,7 +35,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -63,10 +64,10 @@ fun MainContents(viewModel: AddBookViewModel) {
     Column(modifier = Modifier.padding(20.dp)) {
         when (viewModel.getSelectedTabIndex()) {
             AddBookTab.ISBN.ordinal -> {
-                IsbnContents()
+                IsbnContents(viewModel)
             }
             AddBookTab.TITLE.ordinal -> {
-                TitleContents()
+                TitleContents(viewModel)
             }
         }
     }
@@ -129,9 +130,12 @@ fun TabLayout(viewModel: AddBookViewModel) {
 }
 
 @Composable
-fun IsbnContents() {
-    var searchIsbn by remember { mutableStateOf("") }
-    val searchedBookList = mutableListOf(Book(title = "タイトル", author = "著者", image = ""))
+fun IsbnContents(viewModel: AddBookViewModel) {
+    val searchedBookList =
+        mutableListOf(
+            Book(title = "タイトル", author = "著者", image = ""),
+            Book(title = "タイトル2", author = "著者2", image = ""),
+        )
     Column(modifier = Modifier.fillMaxSize()) {
         Column {
             Text(
@@ -146,8 +150,8 @@ fun IsbnContents() {
             )
             Row(modifier = Modifier.padding(top = 5.dp).fillMaxWidth()) {
                 BasicTextField(
-                    value = searchIsbn,
-                    onValueChange = { searchIsbn = it },
+                    value = viewModel.getSearchedIsbn(),
+                    onValueChange = { viewModel.onSearchIsbnChanged(it) },
                     singleLine = true,
                     maxLines = 1,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -193,10 +197,18 @@ fun IsbnContents() {
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                         ),
+                    modifier = Modifier.padding(bottom = 10.dp),
+                )
+                Spacer(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(1.dp)
+                            .background(MaterialTheme.colorScheme.onSurface),
                 )
                 LazyColumn {
                     items(searchedBookList) { book ->
-                        CardView(book = book)
+                        CardView(book = book, viewModel = viewModel)
                     }
                 }
             }
@@ -205,23 +217,32 @@ fun IsbnContents() {
 }
 
 @Composable
-fun TitleContents() {}
+fun TitleContents(viewModel: AddBookViewModel) {}
 
 @Composable
-fun CardView(book: Book) {
+fun CardView(
+    book: Book,
+    viewModel: AddBookViewModel,
+) {
     Row(
-        modifier = Modifier.fillMaxWidth().height(88.dp).background(MaterialTheme.colorScheme.onPrimary)
+        modifier = Modifier.fillMaxWidth().height(88.dp).background(MaterialTheme.colorScheme.onPrimary).padding(5.dp),
     ) {
+        Checkbox(
+            checked = false,
+            onCheckedChange = { /*TODO*/ },
+            modifier = Modifier.fillMaxHeight(),
+        )
         Box(modifier = Modifier.fillMaxWidth(0.3f).fillMaxHeight())
         Column(modifier = Modifier.fillMaxHeight().fillMaxWidth()) {
             Text(text = book.title)
             Text(text = book.author)
         }
     }
-}
-
-@Preview
-@Composable
-fun AddBookScreenPreview() {
-    IsbnContents()
+    Spacer(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .background(MaterialTheme.colorScheme.onSurface),
+    )
 }
