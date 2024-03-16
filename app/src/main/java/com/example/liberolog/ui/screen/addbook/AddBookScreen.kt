@@ -23,10 +23,6 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
@@ -38,6 +34,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.MutableLiveData
 import com.example.liberolog.R
 import com.example.liberolog.model.AddBookTab
 import com.example.liberolog.model.Book
@@ -49,10 +46,7 @@ fun AddBookScreen(
     viewModel: AddBookViewModel = hiltViewModel(),
 ) {
     Column(
-        modifier =
-            Modifier
-                .padding(padding)
-                .fillMaxSize(),
+        modifier = Modifier.padding(padding).fillMaxSize(),
     ) {
         MainContents(viewModel)
     }
@@ -60,132 +54,31 @@ fun AddBookScreen(
 
 @Composable
 fun MainContents(viewModel: AddBookViewModel) {
-    TabLayout(viewModel)
+    val selectedTabIndex: Int =
+        MutableLiveData(viewModel.model.selectedTabIndex).value ?: AddBookTab.ISBN.ordinal
+    val searchedBookList = MutableLiveData(viewModel.model.searchedBookList).value ?: mutableListOf()
+
+    TabLayout(selectedTabIndex, viewModel::onSelectedTabIndex)
     Column(modifier = Modifier.padding(20.dp)) {
-        when (viewModel.getSelectedTabIndex()) {
+        when (selectedTabIndex) {
             AddBookTab.ISBN.ordinal -> {
-                IsbnContents(viewModel)
-            }
-            AddBookTab.TITLE.ordinal -> {
-                TitleContents(viewModel)
-            }
-        }
-    }
-}
-
-@Composable
-fun TabLayout(viewModel: AddBookViewModel) {
-    TabRow(
-        selectedTabIndex = viewModel.getSelectedTabIndex(),
-    ) {
-        Tab(
-            selected = viewModel.getSelectedTabIndex() == AddBookTab.ISBN.ordinal,
-            onClick = { viewModel.onSelectedTabIndex(AddBookTab.ISBN.ordinal) },
-            modifier =
-                Modifier
-                    .background(
-                        if (viewModel.getSelectedTabIndex() == AddBookTab.ISBN.ordinal) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.surface,
-                    )
-                    .padding(15.dp),
-            selectedContentColor = MaterialTheme.colorScheme.surface,
-            unselectedContentColor = MaterialTheme.colorScheme.surfaceVariant,
-        ) {
-            Text(
-                text = "ISBN",
-                style =
-                    TextStyle(
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        fontFamily = FontFamily(Font(R.font.roboto_medium)),
-                        textAlign = TextAlign.Center,
-                    ),
-                color = if (viewModel.getSelectedTabIndex() == AddBookTab.ISBN.ordinal) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
-            )
-        }
-        Tab(
-            selected = viewModel.getSelectedTabIndex() == AddBookTab.TITLE.ordinal,
-            onClick = { viewModel.onSelectedTabIndex(AddBookTab.TITLE.ordinal) },
-            modifier =
-                Modifier
-                    .background(
-                        if (viewModel.getSelectedTabIndex() == AddBookTab.TITLE.ordinal) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.surface,
-                    )
-                    .padding(15.dp),
-            selectedContentColor = MaterialTheme.colorScheme.surface,
-            unselectedContentColor = MaterialTheme.colorScheme.outlineVariant,
-        ) {
-            Text(
-                text = "タイトル",
-                style =
-                    TextStyle(
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        fontFamily = FontFamily(Font(R.font.roboto_medium)),
-                        textAlign = TextAlign.Center,
-                    ),
-                color = if (viewModel.getSelectedTabIndex() == AddBookTab.TITLE.ordinal) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
-            )
-        }
-    }
-}
-
-@Composable
-fun IsbnContents(viewModel: AddBookViewModel) {
-    val searchedBookList =
-        mutableListOf(
-            Book(title = "タイトル", author = "著者", image = ""),
-            Book(title = "タイトル2", author = "著者2", image = ""),
-        )
-    Column(modifier = Modifier.fillMaxSize()) {
-        Column {
-            Text(
-                text = "ISBN",
-                style =
-                    TextStyle(
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = FontFamily(Font(R.font.roboto_medium)),
-                        textAlign = TextAlign.Start,
-                    ),
-            )
-            Row(modifier = Modifier.padding(top = 5.dp).fillMaxWidth()) {
-                BasicTextField(
-                    value = viewModel.getSearchedIsbn(),
-                    onValueChange = { viewModel.onSearchIsbnChanged(it) },
-                    singleLine = true,
-                    maxLines = 1,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier =
-                        Modifier
-                            .border(1.dp, MaterialTheme.colorScheme.onSurface, shape = MaterialTheme.shapes.extraSmall)
-                            .align(Alignment.CenterVertically)
-                            .fillMaxWidth(0.7f),
-                    decorationBox = { innerTextField ->
-                        Box(
-                            modifier = Modifier.height(32.dp).padding(5.dp),
-                            contentAlignment = Alignment.CenterStart,
-                        ) {
-                            innerTextField()
-                        }
-                    },
+                val searchedISBN = MutableLiveData(viewModel.model.searchIsbn).value ?: ""
+                TabContents(
+                    selectedTabIndex,
+                    searchedISBN,
+                    viewModel::onChangedISBN,
+                    viewModel::onClickedSearchButton,
                 )
-                Button(
-                    onClick = { /*TODO*/ },
-                    modifier = Modifier.padding(start = 7.dp),
-                    shape = MaterialTheme.shapes.small,
-                ) {
-                    Text(
-                        text = "検索",
-                        style =
-                            TextStyle(
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Medium,
-                                fontFamily = FontFamily(Font(R.font.roboto_medium)),
-                                textAlign = TextAlign.Center,
-                            ),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
+            }
+
+            AddBookTab.TITLE.ordinal -> {
+                val searchedBookName = MutableLiveData(viewModel.model.searchBookName).value ?: ""
+                TabContents(
+                    selectedTabIndex,
+                    searchedBookName,
+                    viewModel::onChangedBookName,
+                    viewModel::onClickedSearchButton,
+                )
             }
         }
         if (searchedBookList.isNotEmpty()) {
@@ -208,7 +101,7 @@ fun IsbnContents(viewModel: AddBookViewModel) {
                 )
                 LazyColumn {
                     items(searchedBookList) { book ->
-                        CardView(book = book, viewModel = viewModel)
+                        CardView(book = book)
                     }
                 }
             }
@@ -217,23 +110,181 @@ fun IsbnContents(viewModel: AddBookViewModel) {
 }
 
 @Composable
-fun TitleContents(viewModel: AddBookViewModel) {}
+fun TabLayout(
+    selectedTabIndex: Int,
+    onSelectedTabIndex: (Int) -> Unit,
+) {
+    TabRow(
+        selectedTabIndex = selectedTabIndex,
+    ) {
+        Tab(
+            selected = selectedTabIndex == AddBookTab.ISBN.ordinal,
+            onClick = { onSelectedTabIndex(AddBookTab.ISBN.ordinal) },
+            modifier =
+                Modifier.background(
+                    if (selectedTabIndex == AddBookTab.ISBN.ordinal) {
+                        MaterialTheme.colorScheme.onPrimary
+                    } else {
+                        MaterialTheme.colorScheme.surface
+                    },
+                ).padding(15.dp),
+            selectedContentColor = MaterialTheme.colorScheme.surface,
+            unselectedContentColor = MaterialTheme.colorScheme.surfaceVariant,
+        ) {
+            Text(
+                text = "ISBN",
+                style =
+                    TextStyle(
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        fontFamily = FontFamily(Font(R.font.roboto_medium)),
+                        textAlign = TextAlign.Center,
+                    ),
+                color =
+                    if (selectedTabIndex == AddBookTab.ISBN.ordinal) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.outlineVariant
+                    },
+            )
+        }
+        Tab(
+            selected = selectedTabIndex == AddBookTab.TITLE.ordinal,
+            onClick = { onSelectedTabIndex(AddBookTab.TITLE.ordinal) },
+            modifier =
+                Modifier
+                    .background(
+                        if (selectedTabIndex == AddBookTab.TITLE.ordinal) {
+                            MaterialTheme.colorScheme.onPrimary
+                        } else {
+                            MaterialTheme.colorScheme.surface
+                        },
+                    )
+                    .padding(15.dp),
+            selectedContentColor = MaterialTheme.colorScheme.surface,
+            unselectedContentColor = MaterialTheme.colorScheme.outlineVariant,
+        ) {
+            Text(
+                text = "タイトル",
+                style =
+                    TextStyle(
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        fontFamily = FontFamily(Font(R.font.roboto_medium)),
+                        textAlign = TextAlign.Center,
+                    ),
+                color = if (selectedTabIndex == AddBookTab.TITLE.ordinal) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
+            )
+        }
+    }
+}
 
 @Composable
-fun CardView(
-    book: Book,
-    viewModel: AddBookViewModel,
+fun TabContents(
+    selectedTabIndex: Int,
+    searchText: String,
+    onChangeSearchedBox: (String) -> Unit,
+    onClickedSearchButton: () -> Unit,
 ) {
+    Column {
+        Text(
+            text =
+                when (selectedTabIndex) {
+                    AddBookTab.ISBN.ordinal -> "ISBN"
+                    AddBookTab.TITLE.ordinal -> "タイトル"
+                    else -> "ISBN"
+                },
+            style =
+                TextStyle(
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily(Font(R.font.roboto_medium)),
+                    textAlign = TextAlign.Start,
+                ),
+        )
+        Row(
+            modifier =
+                Modifier
+                    .padding(top = 5.dp)
+                    .fillMaxWidth(),
+        ) {
+            BasicTextField(
+                value = searchText,
+                onValueChange = { onChangeSearchedBox(it) },
+                singleLine = true,
+                maxLines = 1,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier =
+                    Modifier
+                        .border(
+                            1.dp,
+                            MaterialTheme.colorScheme.onSurface,
+                            shape = MaterialTheme.shapes.extraSmall,
+                        )
+                        .align(Alignment.CenterVertically)
+                        .fillMaxWidth(0.7f),
+                decorationBox = { innerTextField ->
+                    Box(
+                        modifier =
+                            Modifier
+                                .height(32.dp)
+                                .padding(5.dp),
+                        contentAlignment = Alignment.CenterStart,
+                    ) {
+                        innerTextField()
+                    }
+                },
+            )
+            Button(
+                onClick = { onClickedSearchButton() },
+                modifier = Modifier.padding(start = 7.dp),
+                shape = MaterialTheme.shapes.small,
+            ) {
+                Text(
+                    text = "検索",
+                    style =
+                        TextStyle(
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                            fontFamily = FontFamily(Font(R.font.roboto_medium)),
+                            textAlign = TextAlign.Center,
+                        ),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun CardView(book: Book) {
     Row(
-        modifier = Modifier.fillMaxWidth().height(88.dp).background(MaterialTheme.colorScheme.onPrimary).padding(5.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(88.dp)
+                .background(MaterialTheme.colorScheme.onPrimary)
+                .padding(start = 5.dp),
     ) {
         Checkbox(
             checked = false,
-            onCheckedChange = { /*TODO*/ },
+            onCheckedChange = {
+                // a
+            },
             modifier = Modifier.fillMaxHeight(),
         )
-        Box(modifier = Modifier.fillMaxWidth(0.3f).fillMaxHeight())
-        Column(modifier = Modifier.fillMaxHeight().fillMaxWidth()) {
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxWidth(0.3f)
+                    .fillMaxHeight(),
+        )
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth(),
+        ) {
             Text(text = book.title)
             Text(text = book.author)
         }
