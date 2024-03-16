@@ -65,7 +65,7 @@ fun LiberoLogAppNavHost(navController: NavHostController) {
         },
     ) { padding ->
         paddingValues = padding
-        NavHost(navController = navController, startDestination = NavigationItem.HOME.route) {
+        NavHost(navController = navController, startDestination = NavigationItem.ADD_BOOK.route) {
             composable(
                 route = NavigationItem.LOGIN.route,
             ) {

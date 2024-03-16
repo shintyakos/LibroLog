@@ -1,5 +1,6 @@
 package com.example.liberolog.ui.screen.addbook
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -14,23 +15,31 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -38,6 +47,8 @@ import androidx.lifecycle.MutableLiveData
 import com.example.liberolog.R
 import com.example.liberolog.model.AddBookTab
 import com.example.liberolog.model.Book
+import com.example.liberolog.ui.state.SearchBookState
+import com.example.liberolog.ui.theme.LiberoLogTheme
 import com.example.liberolog.viewmodel.AddBookViewModel
 
 @Composable
@@ -45,18 +56,51 @@ fun AddBookScreen(
     padding: PaddingValues,
     viewModel: AddBookViewModel = hiltViewModel(),
 ) {
-    Column(
-        modifier = Modifier.padding(padding).fillMaxSize(),
-    ) {
-        MainContents(viewModel)
+    val searchBookState by viewModel.searchBookState.collectAsState()
+
+    when (searchBookState) {
+        SearchBookState.LoadState -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center,
+            ) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.primary,
+                    strokeWidth = ProgressIndicatorDefaults.CircularStrokeWidth,
+                )
+            }
+        }
+
+        is SearchBookState.SuccessState -> {
+            Log.d("AddBookScreen", "bookMap: ${(searchBookState as? SearchBookState.SuccessState)?.searchedBookMap}")
+            Column(
+                modifier = Modifier.padding(padding).fillMaxSize(),
+            ) {
+                MainContents(
+                    viewModel,
+                    (searchBookState as? SearchBookState.SuccessState)?.searchedBookMap
+                        ?: emptyMap(),
+                )
+            }
+        }
+
+        else -> {
+            Column(
+                modifier = Modifier.padding(padding).fillMaxSize(),
+            ) {
+                MainContents(viewModel)
+            }
+        }
     }
 }
 
 @Composable
-fun MainContents(viewModel: AddBookViewModel) {
+fun MainContents(
+    viewModel: AddBookViewModel,
+    searchedBookMap: Map<Book, MutableState<Boolean>> = emptyMap(),
+) {
     val selectedTabIndex: Int =
         MutableLiveData(viewModel.model.selectedTabIndex).value ?: AddBookTab.ISBN.ordinal
-    val searchedBookList = MutableLiveData(viewModel.model.searchedBookList).value ?: mutableListOf()
 
     TabLayout(selectedTabIndex, viewModel::onSelectedTabIndex)
     Column(modifier = Modifier.padding(20.dp)) {
@@ -81,31 +125,7 @@ fun MainContents(viewModel: AddBookViewModel) {
                 )
             }
         }
-        if (searchedBookList.isNotEmpty()) {
-            Column(modifier = Modifier.padding(top = 15.dp)) {
-                Text(
-                    text = "検索結果",
-                    style =
-                        TextStyle(
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                        ),
-                    modifier = Modifier.padding(bottom = 10.dp),
-                )
-                Spacer(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .height(1.dp)
-                            .background(MaterialTheme.colorScheme.onSurface),
-                )
-                LazyColumn {
-                    items(searchedBookList) { book ->
-                        CardView(book = book)
-                    }
-                }
-            }
-        }
+        SearchedBookList(searchedBookMap)
     }
 }
 
@@ -213,7 +233,15 @@ fun TabContents(
                 onValueChange = { onChangeSearchedBox(it) },
                 singleLine = true,
                 maxLines = 1,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions =
+                    KeyboardOptions(
+                        keyboardType =
+                            when (selectedTabIndex) {
+                                AddBookTab.ISBN.ordinal -> KeyboardType.Number
+                                AddBookTab.TITLE.ordinal -> KeyboardType.Text
+                                else -> KeyboardType.Number
+                            },
+                    ),
                 modifier =
                     Modifier
                         .border(
@@ -228,7 +256,8 @@ fun TabContents(
                         modifier =
                             Modifier
                                 .height(32.dp)
-                                .padding(5.dp),
+                                .padding(5.dp)
+                                .background(MaterialTheme.colorScheme.surface),
                         contentAlignment = Alignment.CenterStart,
                     ) {
                         innerTextField()
@@ -257,20 +286,55 @@ fun TabContents(
 }
 
 @Composable
-fun CardView(book: Book) {
+fun SearchedBookList(searchedBookMap: Map<Book, MutableState<Boolean>>) {
+    if (searchedBookMap.isNotEmpty()) {
+        Column(modifier = Modifier.padding(top = 15.dp)) {
+            Text(
+                text = "検索結果",
+                style =
+                    TextStyle(
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                    ),
+                modifier = Modifier.padding(bottom = 10.dp),
+            )
+            Spacer(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(MaterialTheme.colorScheme.onSurface),
+            )
+            LazyColumn {
+                items(searchedBookMap.toList()) { (book, checkedState) ->
+                    CardView(book = book, checkedState = checkedState)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CardView(
+    book: Book,
+    checkedState: MutableState<Boolean>,
+) {
     Row(
         modifier =
             Modifier
+                .toggleable(
+                    value = checkedState.value,
+                    role = Role.Checkbox,
+                    onValueChange = { checkedState.value = it },
+                )
                 .fillMaxWidth()
                 .height(88.dp)
                 .background(MaterialTheme.colorScheme.onPrimary)
                 .padding(start = 5.dp),
     ) {
         Checkbox(
-            checked = false,
-            onCheckedChange = {
-                // a
-            },
+            checked = checkedState.value,
+            onCheckedChange = null,
             modifier = Modifier.fillMaxHeight(),
         )
         Box(
@@ -296,4 +360,17 @@ fun CardView(book: Book) {
                 .height(1.dp)
                 .background(MaterialTheme.colorScheme.onSurface),
     )
+}
+
+@Preview
+@Composable
+fun preView() {
+    LiberoLogTheme {
+        TabContents(
+            selectedTabIndex = 0,
+            searchText = "",
+            onChangeSearchedBox = {},
+            onClickedSearchButton = {},
+        )
+    }
 }

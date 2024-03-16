@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -22,6 +24,16 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        val properties = Properties()
+        properties.load(project.rootProject.file("local.properties").inputStream())
+        // local.propertiesのapi_keyに定義されている値を読み込む
+        val apiKey = properties.getProperty("api_key")
+        // ついでにbuildConfigFieldに定義
+        buildConfigField(
+            "String",
+            "API_KEY",
+            "\"${apiKey}\"",
+        )
     }
 
     buildTypes {
@@ -100,4 +112,10 @@ dependencies {
     implementation("com.amplifyframework:aws-auth-cognito:2.14.10")
     implementation("androidx.compose.material:material-icons-core:1.6.2")
     implementation("androidx.compose.material:material-icons-extended:1.6.2")
+    // Retrofit for API requests
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    // OkHttp for logging
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 }

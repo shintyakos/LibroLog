@@ -5,8 +5,11 @@ data class HomeScreenModel(
     val recBookList: List<Book>? = null,
 )
 
-data class Book(
-    val title: String,
-    val author: String,
-    val image: String,
-)
+class Book {
+    var title: String = ""
+    var author: String = ""
+    var image: String = ""
+        set(value) {
+            field = value.replace("http://", "https://")
+        }
+}
