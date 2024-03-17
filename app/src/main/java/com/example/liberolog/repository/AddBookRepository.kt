@@ -17,17 +17,14 @@ class AddBookRepository
             private const val TAG = "AddBookRepository"
         }
 
-        suspend fun searchBookByIsbn(isbn: String) =
-            withContext(Dispatchers.IO) {
-                return@withContext searchBookApiByISBN(isbn = isbn)
-            }
+        suspend fun searchBook(
+            isbn: String? = null,
+            title: String? = null,
+        ) = withContext(Dispatchers.IO) {
+            return@withContext searchBookApi(isbn = isbn, title = title)
+        }
 
-        suspend fun searchBookByTitle(title: String) =
-            withContext(Dispatchers.IO) {
-                return@withContext searchBookApiByISBN(title = title)
-            }
-
-        private suspend fun searchBookApiByISBN(
+        private suspend fun searchBookApi(
             isbn: String? = null,
             title: String? = null,
         ): List<BookData> {

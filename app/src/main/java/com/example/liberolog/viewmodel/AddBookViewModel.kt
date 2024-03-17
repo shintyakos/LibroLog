@@ -1,6 +1,5 @@
 package com.example.liberolog.viewmodel
 
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,25 +44,23 @@ class AddBookViewModel
             model = model.copy(searchBookName = searchBookName)
         }
 
-        fun onCheckedBox(book: Book) {
-            Log.d(TAG, "bookId: $book")
-        }
-
         fun onClickedSearchButton() {
             viewModelScope.launch {
                 var result: List<BookData> = emptyList()
                 when (model.selectedTabIndex) {
                     AddBookTab.ISBN.ordinal -> {
-                        Log.d(TAG, "searchIsbn: ${model.searchIsbn}")
                         searchBookState.value = SearchBookState.LoadState
-                        result = repository.searchBookByIsbn(model.searchIsbn)
+                        try {
+                            result = repository.searchBook(isbn = model.searchIsbn, title = null)
+                        } catch (e: Exception) {
+                            searchBookState.value = SearchBookState.ErrorState
+                            return@launch
+                        }
                     }
 
                     AddBookTab.TITLE.ordinal -> {
-                        Log.d(TAG, "searchBookName: ${model.searchBookName}")
                         searchBookState.value = SearchBookState.LoadState
-                        result = repository.searchBookByTitle(model.searchBookName)
-                        Log.d(TAG, "result: $result")
+                        result = repository.searchBook(isbn = null, title = model.searchBookName)
                     }
 
                     else -> {}

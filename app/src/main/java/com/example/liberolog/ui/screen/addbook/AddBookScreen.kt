@@ -42,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.MutableLiveData
 import com.example.liberolog.R
@@ -80,6 +81,19 @@ fun AddBookScreen(
                     viewModel,
                     (searchBookState as? SearchBookState.SuccessState)?.searchedBookMap
                         ?: emptyMap(),
+                )
+            }
+        }
+
+        is SearchBookState.ErrorState -> {
+            Dialog(onDismissRequest = { /*TODO*/ }) {
+                Text(
+                    text = "検索に失敗しました。",
+                    style =
+                        TextStyle(
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center,
+                        ),
                 )
             }
         }
