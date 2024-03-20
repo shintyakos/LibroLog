@@ -59,11 +59,11 @@ class HomeViewModel
                             HomeScreenModel(
                                 monBookList =
                                     books.map { book ->
-                                        Book(
-                                            title = book.title,
-                                            author = book.author,
-                                            image = book.coverImageURL.replace("http://", "https://"),
-                                        )
+                                        Book().apply {
+                                            title = book.title
+                                            author = book.author
+                                            image = book.coverImageURL
+                                        }
                                     },
                             ),
                         ),
