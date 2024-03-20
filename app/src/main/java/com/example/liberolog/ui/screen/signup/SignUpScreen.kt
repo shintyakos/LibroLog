@@ -3,6 +3,7 @@ package com.example.liberolog.ui.screen.signup
 import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -33,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -47,6 +49,9 @@ import com.example.liberolog.R
 import com.example.liberolog.ui.state.SignUpState
 import com.example.liberolog.utils.NavigationItem
 import com.example.liberolog.viewmodel.SignUpViewModel
+import java.text.DateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun SignUpScreen(
@@ -54,6 +59,7 @@ fun SignUpScreen(
     navigationTo: (String) -> Unit,
     viewModel: SignUpViewModel = hiltViewModel(),
 ) {
+    val focusManager = LocalFocusManager.current
     val signUpState by viewModel.state.collectAsState()
 
     when (signUpState) {
@@ -71,7 +77,12 @@ fun SignUpScreen(
         }
 
         is SignUpState.SuccessFromSignUpState -> {
-            ConfirmSignUpContents(viewModel)
+            ConfirmSignUpContents(
+                viewModel.model.email,
+                viewModel.model.code,
+                viewModel::onCodeChange,
+                viewModel::confirmSignUp,
+            )
         }
 
         is SignUpState.SuccessFromConfirmSignUpState -> {
@@ -79,19 +90,54 @@ fun SignUpScreen(
         }
 
         is SignUpState.ErrorFromConfirmSignUpState -> {
-            ConfirmSignUpContents(viewModel)
+            ConfirmSignUpContents(
+                viewModel.model.email,
+                viewModel.model.code,
+                viewModel::onCodeChange,
+                viewModel::confirmSignUp,
+            )
         }
 
         else -> {
-            Column(modifier = Modifier.padding(padding)) {
-                MainContents(viewModel)
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = { focusManager.clearFocus() },
+                        ),
+            ) {
+                MainContents(
+                    viewModel.model.userName,
+                    viewModel::onUserNameChange,
+                    viewModel.model.email,
+                    viewModel::onEmailChange,
+                    viewModel.model.password,
+                    viewModel::onPasswordChange,
+                    viewModel.model.confirmPassword,
+                    viewModel::onConfirmPasswordChange,
+                    viewModel::signUp,
+                )
             }
         }
     }
 }
 
 @Composable
-fun MainContents(viewModel: SignUpViewModel) {
+fun MainContents(
+    userName: String,
+    onChangeUserName: (String) -> Unit,
+    email: String,
+    onChangeEmail: (String) -> Unit,
+    password: String,
+    onChangePassword: (String) -> Unit,
+    confirmPassword: String,
+    onChangeConfirmPassword: (String) -> Unit,
+    signUp: () -> Unit,
+) {
     var selectedDate = rememberDatePickerState()
     var selectedDateText by remember { mutableStateOf("日付を選択") }
     var state by remember { mutableStateOf(false) }
@@ -100,32 +146,32 @@ fun MainContents(viewModel: SignUpViewModel) {
         // ユーザー名
         SignUpTextView(
             text = stringResource(id = R.string.signup_username),
-            value = viewModel.getUserName(),
-            valueChange = { viewModel.onUserNameChange(it) },
+            value = userName,
+            valueChange = { onChangeUserName(it) },
             keyOption = KeyboardOptions(keyboardType = KeyboardType.Text),
         )
 
         // メールアドレス
         SignUpTextView(
             text = stringResource(id = R.string.signup_email),
-            value = viewModel.getEmail(),
-            valueChange = { viewModel.onEmailChange(it) },
+            value = email,
+            valueChange = { onChangeEmail(it) },
             keyOption = KeyboardOptions(keyboardType = KeyboardType.Email),
         )
 
         // パスワード
         SignUpTextView(
             text = stringResource(id = R.string.signup_password),
-            value = viewModel.getPassword(),
-            valueChange = { viewModel.onPasswordChange(it) },
+            value = password,
+            valueChange = { onChangePassword(it) },
             keyOption = KeyboardOptions(keyboardType = KeyboardType.Password),
         )
 
         // パスワード確認
         SignUpTextView(
             text = stringResource(id = R.string.signup_password_confirm),
-            value = viewModel.getConfirmPassword(),
-            valueChange = { viewModel.onConfirmPasswordChange(it) },
+            value = confirmPassword,
+            valueChange = { onChangeConfirmPassword(it) },
             keyOption = KeyboardOptions(keyboardType = KeyboardType.Password),
         )
 
@@ -135,21 +181,31 @@ fun MainContents(viewModel: SignUpViewModel) {
                 onValueChange = { selectedDateText = selectedDate.toString() },
                 readOnly = true,
             )
-            Box(modifier = Modifier.matchParentSize().clickable { state = true })
+            Box(
+                modifier =
+                    Modifier
+                        .matchParentSize()
+                        .clickable { state = true },
+            )
         }
 
         if (state) {
+            val format = DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.JAPAN)
             DatePickerDialog(
                 onDismissRequest = { state = false },
                 confirmButton = {
-                    Button(onClick = {
-                        state = false
-                    }) {
+                    Button(
+                        onClick = {
+                            selectedDate.setSelection(selectedDate.selectedDateMillis)
+                            selectedDateText = format.format(Date(selectedDate.selectedDateMillis!!))
+                            state = false
+                        },
+                    ) {
                         Text("OK")
                     }
                 },
             ) {
-                DatePicker(selectedDate)
+                DatePicker(state = selectedDate)
             }
         }
     }
@@ -157,7 +213,7 @@ fun MainContents(viewModel: SignUpViewModel) {
     Box(modifier = Modifier.padding(20.dp)) {
         Button(
             onClick = {
-                viewModel.signUp()
+                signUp()
             },
             modifier =
                 Modifier
@@ -170,7 +226,12 @@ fun MainContents(viewModel: SignUpViewModel) {
 }
 
 @Composable
-fun ConfirmSignUpContents(viewModel: SignUpViewModel) {
+fun ConfirmSignUpContents(
+    email: String,
+    code: String,
+    onChangeCode: (String) -> Unit,
+    confirmSignUp: () -> Unit,
+) {
     Column(modifier = Modifier.padding(20.dp)) {
         Column(modifier = Modifier.padding(bottom = 36.dp)) {
             Text(
@@ -185,7 +246,7 @@ fun ConfirmSignUpContents(viewModel: SignUpViewModel) {
             )
 
             Text(
-                text = stringResource(id = R.string.confirm_signup_code_description, viewModel.getEmail()),
+                text = stringResource(id = R.string.confirm_signup_code_description, email),
                 style =
                     TextStyle(
                         fontSize = 12.sp,
@@ -205,8 +266,8 @@ fun ConfirmSignUpContents(viewModel: SignUpViewModel) {
                         width = 1.dp,
                         color = androidx.compose.ui.graphics.Color.Black,
                     ),
-            value = viewModel.getCode(),
-            onValueChange = { viewModel.onCodeChange(it) },
+            value = code,
+            onValueChange = { onChangeCode(it) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             visualTransformation = VisualTransformation.None,
@@ -224,7 +285,7 @@ fun ConfirmSignUpContents(viewModel: SignUpViewModel) {
             },
         )
         Button(
-            onClick = { viewModel.confirmSignUp() },
+            onClick = { confirmSignUp() },
             modifier =
                 Modifier
                     .fillMaxWidth()

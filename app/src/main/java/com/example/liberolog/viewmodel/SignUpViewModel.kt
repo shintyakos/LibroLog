@@ -27,32 +27,16 @@ class SignUpViewModel
             private set
         val state = MutableStateFlow<SignUpState>(SignUpState.StartState)
 
-        fun getUserName(): String {
-            return this.model.userName
-        }
-
         fun onUserNameChange(userName: String) {
             model = model.copy(userName = userName)
-        }
-
-        fun getEmail(): String {
-            return this.model.email
         }
 
         fun onEmailChange(email: String) {
             model = model.copy(email = email)
         }
 
-        fun getPassword(): String {
-            return this.model.password
-        }
-
         fun onPasswordChange(password: String) {
             model = model.copy(password = password)
-        }
-
-        fun getConfirmPassword(): String {
-            return this.model.confirmPassword
         }
 
         fun onConfirmPasswordChange(confirmPassword: String) {
