@@ -1,6 +1,7 @@
 package com.example.liberolog.ui.screen.signup
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -34,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -42,11 +44,13 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.liberolog.R
 import com.example.liberolog.ui.state.SignUpState
+import com.example.liberolog.ui.theme.LiberoLogTheme
 import com.example.liberolog.utils.NavigationItem
 import com.example.liberolog.viewmodel.SignUpViewModel
 import java.text.DateFormat
@@ -138,7 +142,7 @@ fun MainContents(
     onChangeConfirmPassword: (String) -> Unit,
     signUp: () -> Unit,
 ) {
-    var selectedDate = rememberDatePickerState()
+    val selectedDate = rememberDatePickerState()
     var selectedDateText by remember { mutableStateOf("日付を選択") }
     var state by remember { mutableStateOf(false) }
 
@@ -180,12 +184,16 @@ fun MainContents(
                 value = selectedDateText,
                 onValueChange = { selectedDateText = selectedDate.toString() },
                 readOnly = true,
+                textStyle =
+                    TextStyle(
+                        color = MaterialTheme.colorScheme.onSurface,
+                    ),
             )
             Box(
                 modifier =
                     Modifier
                         .matchParentSize()
-                        .clickable { state = true },
+                        .clickable { state = true }
             )
         }
 
@@ -264,7 +272,7 @@ fun ConfirmSignUpContents(
                     .fillMaxWidth()
                     .border(
                         width = 1.dp,
-                        color = androidx.compose.ui.graphics.Color.Black,
+                        color = Color.Black,
                     ),
             value = code,
             onValueChange = { onChangeCode(it) },
@@ -300,6 +308,7 @@ fun ConfirmSignUpContents(
                     ),
             )
         }
+
         Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center,
@@ -312,6 +321,7 @@ fun ConfirmSignUpContents(
                             fontSize = 16.sp,
                             fontFamily = FontFamily(Font(R.font.roboto_medium)),
                         ),
+                    color = MaterialTheme.colorScheme.primary,
                 )
             }
         }
@@ -363,5 +373,25 @@ private fun SignUpTextView(
                 }
             },
         )
+    }
+}
+
+@Preview
+@Composable
+fun preView() {
+    LiberoLogTheme {
+        Column(modifier = Modifier.fillMaxSize()) {
+            MainContents(
+                userName = "test",
+                onChangeUserName = {},
+                email = "",
+                onChangeEmail = {},
+                password = "",
+                onChangePassword = {},
+                confirmPassword = "",
+                onChangeConfirmPassword = {},
+                signUp = {},
+            )
+        }
     }
 }

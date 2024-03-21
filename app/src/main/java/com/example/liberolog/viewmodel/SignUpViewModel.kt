@@ -80,8 +80,9 @@ class SignUpViewModel
                         state.value = SignUpState.SuccessFromConfirmSignUpState
                         return@launch
                     }
+                } else {
+                    state.value = SignUpState.ErrorFromConfirmSignUpState
                 }
-                state.value = SignUpState.ErrorFromConfirmSignUpState
             }
         }
     }
