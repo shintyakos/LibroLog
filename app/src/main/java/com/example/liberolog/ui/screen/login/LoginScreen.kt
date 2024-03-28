@@ -31,7 +31,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -45,13 +47,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.liberolog.R
-import com.example.liberolog.repository.LoginRepository
 import com.example.liberolog.ui.state.LoginState
 import com.example.liberolog.utils.NavigationItem
 import com.example.liberolog.viewmodel.LoginViewModel
@@ -103,7 +102,15 @@ fun LoginScreen(
                             onClick = { focusManager.clearFocus() },
                         ),
             ) {
-                MainContents(viewModel, navigationTo, loginState is LoginState.ErrorState)
+                MainContents(
+                    email = viewModel.model.email,
+                    onChangeEmail = viewModel::onEmailChange,
+                    password = viewModel.model.password,
+                    onChangePassword = viewModel::onPasswordChange,
+                    login = viewModel::login,
+                    navigationTo,
+                    loginState is LoginState.ErrorState,
+                )
             }
         }
     }
@@ -117,10 +124,15 @@ fun LoginScreen(
  */
 @Composable
 fun MainContents(
-    viewModel: LoginViewModel,
+    email: String,
+    onChangeEmail: (String) -> Unit,
+    password: String,
+    onChangePassword: (String) -> Unit,
+    login: () -> Unit,
     navigationTo: (String) -> Unit,
     isErrorFlag: Boolean,
 ) {
+    var passwordVisibility by remember { mutableStateOf(true) }
     Column(
         modifier =
             Modifier.padding(start = 20.dp, top = 20.dp, end = 20.dp),
@@ -149,8 +161,8 @@ fun MainContents(
                             shape = RoundedCornerShape(5.dp),
                         )
                         .focusRequester(FocusRequester()),
-                value = viewModel.model.email,
-                onValueChange = { viewModel.onEmailChange(it) },
+                value = email,
+                onValueChange = { onChangeEmail(it) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 decorationBox = { innerTextField ->
@@ -208,12 +220,12 @@ fun MainContents(
                             shape = RoundedCornerShape(5.dp),
                         )
                         .focusRequester(FocusRequester()),
-                value = viewModel.model.password,
-                onValueChange = { viewModel.onPasswordChange(it) },
+                value = password,
+                onValueChange = { onChangePassword(it) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 visualTransformation =
-                    if (viewModel.model.passwordVisibility) {
+                    if (passwordVisibility) {
                         PasswordVisualTransformation()
                     } else {
                         VisualTransformation.None
@@ -228,12 +240,12 @@ fun MainContents(
                     ) {
                         innerTextField()
                         IconButton(
-                            onClick = { viewModel.onPasswordVisibilityChange() },
+                            onClick = { passwordVisibility = !passwordVisibility },
                             modifier = Modifier.align(Alignment.CenterEnd),
                         ) {
                             Icon(
                                 imageVector =
-                                    if (viewModel.model.passwordVisibility) {
+                                    if (passwordVisibility) {
                                         Icons.Filled.VisibilityOff
                                     } else {
                                         Icons.Filled.Visibility
@@ -266,20 +278,6 @@ fun MainContents(
                 }
             }
         }
-        if (isErrorFlag) {
-            Row {
-                Text(
-                    text = stringResource(R.string.login_error),
-                    style =
-                        TextStyle(
-                            fontSize = 24.sp,
-                            color = MaterialTheme.colorScheme.error,
-                            fontFamily = FontFamily(Font(R.font.roboto_medium)),
-                        ),
-                    modifier = Modifier.padding(bottom = 10.dp),
-                )
-            }
-        }
     }
     Box(
         modifier =
@@ -288,7 +286,7 @@ fun MainContents(
                 .padding(20.dp),
     ) {
         Button(
-            onClick = { viewModel.login() },
+            onClick = { login() },
             modifier =
                 Modifier
                     .fillMaxWidth()
@@ -320,6 +318,7 @@ fun MainContents(
                 )
             }
         }
+
         Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center,
@@ -336,13 +335,5 @@ fun MainContents(
                 )
             }
         }
-    }
-}
-
-@Preview(device = Devices.PIXEL_6, showBackground = true)
-@Composable
-fun PreMainContents() {
-    Column {
-        MainContents(LoginViewModel(repository = LoginRepository()), {}, false)
     }
 }
